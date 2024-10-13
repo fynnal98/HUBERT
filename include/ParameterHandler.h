@@ -1,10 +1,9 @@
-// ParameterHandler.h
 #ifndef PARAMETERHANDLER_H
 #define PARAMETERHANDLER_H
 
-#include "PID.h"  // PID-Klasse einbinden
+#include "PID.h"
 
-// Servo-Pins
+// Definition der Servo-Pins
 extern int pinServo1;
 extern int pinServo2;
 extern int pinServo3;
@@ -45,6 +44,7 @@ extern bool useLowPass;
 extern bool useHighPass;
 extern bool useMovingAvg;
 extern bool useKalman;
+extern bool useRPMFilter;  // Neu: Flag für RPM-Filter
 
 // CG-Offsets für den MPU
 extern float cgOffsetX;
@@ -60,8 +60,13 @@ extern float gyroDriftOffsetZ;
 extern const int calibrationDuration;
 
 // Kalibrierungsstatus
-extern bool calibrationCompleted;
+extern bool calibrationCompleted;  // Deklaration der externen Variable
+
+// RPM-Filterparameter
+extern int rpm;
 
 void initializeParameters();
+void setRPM(int newRPM);
+int getRPM();
 
-#endif
+#endif // PARAMETERHANDLER_H

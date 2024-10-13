@@ -1,4 +1,5 @@
 #include "FBL.h"
+#include "ParameterHandler.h"  // Importiere ParameterHandler
 
 // Constructor
 FBL::FBL(int pin1, int pin2, int pin3, FilterHandler& rollFilterHandler, FilterHandler& pitchFilterHandler, DataLogger& logger)
@@ -24,8 +25,8 @@ void FBL::update(MPU6050& mpu, unsigned long channel1Pulse, unsigned long channe
     mpu.calculateCorrectedAccelerations(&a, &g, ax_corrected, ay_corrected);
 
     // Apply filters but swap x (roll) and y (pitch) in the correction logic with negation for 180-degree rotation
-    float pitchCorrection = rollFilterHandler.apply(-ax_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, logger); // Treat ax as pitch, negate for 180 degrees
-    float rollCorrection = pitchFilterHandler.apply(-ay_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, logger);  // Treat ay as roll, negate for 180 degrees
+    float pitchCorrection = rollFilterHandler.apply(-ax_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger); // Verwende useRPMFilter aus ParameterHandler
+    float rollCorrection = pitchFilterHandler.apply(-ay_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger);  // Verwende useRPMFilter aus ParameterHandler
 
     // Add corrections to the channel data
     unsigned long servo1Pulse = channel2Pulse + pitchCorrection; // Back
