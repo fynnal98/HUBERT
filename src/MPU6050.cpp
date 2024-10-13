@@ -31,7 +31,7 @@ void MPU6050::getEvent(sensors_event_t* a, sensors_event_t* g, sensors_event_t* 
     DataLogger dataLogger;
 
     // Verwende die angepasste Log-Funktion mit Standardwerten für gefilterte Daten
-    dataLogger.logData(a->acceleration.x, a->acceleration.y);
+    dataLogger.logData(g->gyro.x, g->gyro.y);
 }
 
 void MPU6050::applyGyroOffset(sensors_event_t& g, float gyroXOffset, float gyroYOffset, float gyroZOffset) {

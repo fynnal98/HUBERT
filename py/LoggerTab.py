@@ -115,7 +115,7 @@ class LoggerTab(QWidget):
     def log_data(self):
         with open(self.filename, mode='w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(['ax', 'ay', 'rollFiltered', 'pitchFiltered'])
+            csv_writer.writerow(['gx', 'gy', 'rollFiltered', 'pitchFiltered'])
 
             while self.is_logging:
                 if self.serial_port.in_waiting > 0:

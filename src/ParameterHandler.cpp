@@ -35,8 +35,10 @@ float kalmanQ = 0.02;
 float kalmanR = 0.2;
 float kalmanEstimateError = 1.0;
 float kalmanInitialEstimate = 0.0;
+
 // RPM für den RPM-Filter
 int rpm = 20000;
+float bandwidth = 10.0;
 
 // Flags, um Filter zu aktivieren oder deaktivieren
 bool useLowPass = true;

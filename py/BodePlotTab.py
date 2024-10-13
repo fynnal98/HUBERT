@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QLabel, QLineEdit, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QLabel, QLineEdit, QHBoxLayout, QSpacerItem, QSizePolicy
 
 
 class BodePlotCanvas(FigureCanvas):
@@ -56,8 +56,8 @@ class BodePlotTab(QWidget):
         self.load_button.clicked.connect(self.load_csv)
 
         # Create canvases for raw and filtered data
-        self.raw_canvas = BodePlotCanvas(self, width=5, height=4)
-        self.filtered_canvas = BodePlotCanvas(self, width=5, height=4)
+        self.raw_canvas = BodePlotCanvas(self, width=5, height=10)
+        self.filtered_canvas = BodePlotCanvas(self, width=5, height=10)
 
         # Abtastrate Eingabe
         self.sampling_rate_label = QLabel(f"Sampling Rate (Hz):", self)
@@ -84,6 +84,10 @@ class BodePlotTab(QWidget):
         plot_layout.addWidget(self.raw_canvas)
         plot_layout.addWidget(self.filtered_canvas)
 
+        # Spacer einfügen
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        plot_layout.addItem(spacer)
+
         layout.addLayout(plot_layout)
         self.setLayout(layout)
 
@@ -109,10 +113,11 @@ class BodePlotTab(QWidget):
     def process_data(self, file_name=None):
         if file_name:
             df = pd.read_csv(file_name)
-            self.raw_x = df['ax'].values
-            self.raw_y = df['ay'].values
+            self.raw_x = df['gx'].values  # Gyro X-Achse
+            self.raw_y = df['gy'].values  # Gyro Y-Achse
             self.filtered_x = df['rollFiltered'].values
             self.filtered_y = df['pitchFiltered'].values
+
 
         # Anzahl der Datenpunkte
         N = len(self.raw_x)

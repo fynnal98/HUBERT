@@ -6,7 +6,8 @@
 class DataLogger {
 public:
     DataLogger();
-    void logData(float ax, float ay, float rollFiltered = -1, float pitchFiltered = -1);  // Einheitliche Methode
+    // Protokolliert die Gyroskopdaten gx, gy und optional gefilterte Roll- und Pitch-Werte
+    void logData(float gx, float gy, float rollFiltered = -1, float pitchFiltered = -1);
 };
 
 #endif // DATALOGGER_H

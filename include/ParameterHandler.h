@@ -64,6 +64,8 @@ extern bool calibrationCompleted;  // Deklaration der externen Variable
 
 // RPM-Filterparameter
 extern int rpm;
+extern float bandwidth;  
+
 
 void initializeParameters();
 void setRPM(int newRPM);

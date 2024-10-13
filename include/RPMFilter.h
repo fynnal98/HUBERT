@@ -5,12 +5,13 @@ class RPMFilter {
 public:
     RPMFilter();
     void setRPM(int rpm);
+    void setBandwidth(float bw); 
     float apply(float gyroValue);
 
 private:
     float notchFrequency;
     float calculateNotchFrequency(int rpm);
-    float bandwidth;
 };
+
 
 #endif // RPMFILTER_H
