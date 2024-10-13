@@ -6,8 +6,8 @@ int pinServo2 = 14;
 int pinServo3 = 15;
 
 // PID-Controller
-PID pidRoll(70.0, 0.01, 1, integralLimit, rollPIDFactor);
-PID pidPitch(70.0, 0.01, 1, integralLimit, pitchPIDFactor);
+PID pidRoll(80.0, 0.0, 5, integralLimit, rollPIDFactor);
+PID pidPitch(80.0, 0.0, 5, integralLimit, pitchPIDFactor);
 PID pidYaw(90.0, 0.0, 5.0, integralLimit, yawPIDFactor);
 
 float rollPIDFactor = 1;
@@ -43,7 +43,7 @@ bool useLowPass = true;
 bool useHighPass = true;
 bool useMovingAvg = false;
 bool useKalman = false;
-bool useRPMFilter = true;  // Neu: Standardmäßig aktiviert
+bool useRPMFilter = true; 
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;

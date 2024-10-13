@@ -13,10 +13,10 @@ void MPU6050::begin() {
             delay(10);
         }
     }
-    mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-    mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
-    mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
-
+    mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
+    mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+    mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
+    
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(MPU6050_SMPLRT_DIV);
     Wire.write(0x00); 
