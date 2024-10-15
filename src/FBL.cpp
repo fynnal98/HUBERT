@@ -28,6 +28,10 @@ void FBL::update(MPU6050& mpu, unsigned long channel1Pulse, unsigned long channe
     float pitchCorrection = rollFilterHandler.apply(-ax_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger); // Verwende useRPMFilter aus ParameterHandler
     float rollCorrection = pitchFilterHandler.apply(-ay_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger);  // Verwende useRPMFilter aus ParameterHandler
 
+    // float pitchCorrection = rollFilterHandler.apply(g.gyro.x, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger); // Verwende useRPMFilter aus ParameterHandler
+    // float rollCorrection = pitchFilterHandler.apply(g.gyro.y, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger);  // Verwende useRPMFilter aus ParameterHandler
+
+
     // Add corrections to the channel data
     unsigned long servo1Pulse = channel2Pulse + pitchCorrection; // Back
     unsigned long servo2Pulse = channel6Pulse + (-0.5 * pitchCorrection - 0.866 * rollCorrection); // Left

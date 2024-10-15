@@ -6,8 +6,8 @@ int pinServo2 = 14;
 int pinServo3 = 15;
 
 // PID-Controller
-PID pidRoll(80.0, 0.0, 5, integralLimit, rollPIDFactor);
-PID pidPitch(80.0, 0.0, 5, integralLimit, pitchPIDFactor);
+PID pidRoll(90.0, 0.0, 10, integralLimit, rollPIDFactor);
+PID pidPitch(90.0, 0.0, 10, integralLimit, pitchPIDFactor);
 PID pidYaw(90.0, 0.0, 5.0, integralLimit, yawPIDFactor);
 
 float rollPIDFactor = 1;
@@ -28,9 +28,9 @@ const int wireSDA = 21;
 const int wireSCL = 22;
 
 // Filterparameter
-float lowPassAlpha = 0.2;
+float lowPassAlpha = 0.4;
 float highPassAlpha = 0.999;
-int movingAvgWindowSize = 2;
+int movingAvgWindowSize = 5;
 float kalmanQ = 0.02;
 float kalmanR = 0.2;
 float kalmanEstimateError = 1.0;
@@ -44,8 +44,8 @@ float bandwidth = 10.0;
 bool useLowPass = true;
 bool useHighPass = true;
 bool useMovingAvg = false;
-bool useKalman = false;
-bool useRPMFilter = true; 
+bool useKalman = true;
+bool useRPMFilter = false; 
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;
