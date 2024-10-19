@@ -70,23 +70,29 @@ void loop() {
     }
 
     if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel10Pulse)) {
+        // Deklariere die Event-Variablen
         sensors_event_t a, g, temp;
+        
+        // Rufe die Daten des MPU ab
         mpu.getEvent(&a, &g, &temp);
-        mpu.applyGyroOffset(g, gyroDriftOffsetX, gyroDriftOffsetY, gyroDriftOffsetZ);
-        float yawRate = g.gyro.z;
 
-        if (Util::correctionEnabled(channel10Pulse)) {
-            // Übergib die Filter-Flags und wende die Filter an
+        // Prüfe, ob Channel 10 aktiviert ist und der MPU verbunden ist
+        if (Util::correctionEnabled(channel10Pulse) && mpu.isConnected()) {
+            // Wende Korrekturen an
             fbl.update(mpu, channel1Pulse, channel2Pulse, channel6Pulse, useLowPass, useHighPass, useMovingAvg, useKalman);
-            tailRotor.update(channel8Pulse, channel4Pulse, yawRate);
+            // Übergib die Z-Achse des Gyroskops an den TailRotor
+            tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
         } else {
+            // Wenn keine Korrektur, direktes Ansteuern der Servos
             fbl.servo1.writeMicroseconds(channel2Pulse);
             fbl.servo2.writeMicroseconds(channel6Pulse);
             fbl.servo3.writeMicroseconds(channel1Pulse);
 
+            // TailRotor ohne Korrektur ansteuern
             tailRotor.update(channel8Pulse, channel4Pulse, 0);
         }
 
+        // Setze den MainMotor-Puls
         mainMotorServo.setPulse(channel8Pulse);
     } else {
         Serial.println("Fehler beim Lesen der Kanäle.");

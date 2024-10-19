@@ -14,10 +14,16 @@ public:
     void applyGyroOffset(sensors_event_t& g, float gyroXOffset, float gyroYOffset, float gyroZOffset);
     void calculateCorrectedAccelerations(sensors_event_t* a, sensors_event_t* g, float& ax_corrected, float& ay_corrected);
     void setCGOffsets(float offsetX, float offsetY, float offsetZ);
+    
+    // Neue Methode, um den Verbindungsstatus des MPU zu überprüfen
+    bool isConnected() const;
 
 private:
     Adafruit_MPU6050 mpu;
     float cgOffsetX, cgOffsetY, cgOffsetZ;
+
+    // Variable, um den Verbindungsstatus des MPU zu speichern
+    bool mpuConnected;
 };
 
 #endif // MPU6050_H
