@@ -19,21 +19,22 @@ class SettingsTab(QWidget):
         filter_label = QLabel("<b>Filter Settings</b>")
         form_layout.addRow(filter_label)
 
-        # LowPass Filter
+        # LowPass Filter 
         self.useLowPass = QCheckBox('Use LowPass')
-        self.lowPassAlpha = QLineEdit('0.2')
-        self.lowPassAlpha.setEnabled(False)  # Initially disabled
-        self.useLowPass.stateChanged.connect(lambda: self.toggle_parameters(self.useLowPass, self.lowPassAlpha))
-        form_layout.addRow(self.useLowPass, QLabel('LowPass Alpha:'))
-        form_layout.addRow(self.lowPassAlpha)
+        self.lowPassFrequency = QLineEdit('0.2')  # This is now Frequency instead of Alpha
+        self.lowPassFrequency.setEnabled(False)  # Initially disabled
+        self.useLowPass.stateChanged.connect(lambda: self.toggle_parameters(self.useLowPass, self.lowPassFrequency))
+        form_layout.addRow(self.useLowPass, QLabel('LowPass Frequency:'))
+        form_layout.addRow(self.lowPassFrequency)
 
-        # HighPass Filter
+
+        # HighPass Filter 
         self.useHighPass = QCheckBox('Use HighPass')
-        self.highPassAlpha = QLineEdit('0.999')
-        self.highPassAlpha.setEnabled(False)  # Initially disabled
-        self.useHighPass.stateChanged.connect(lambda: self.toggle_parameters(self.useHighPass, self.highPassAlpha))
-        form_layout.addRow(self.useHighPass, QLabel('HighPass Alpha:'))
-        form_layout.addRow(self.highPassAlpha)
+        self.highPassFrequency = QLineEdit('0.999')  # Frequency für HighPass
+        self.highPassFrequency.setEnabled(False)  # Initially disabled
+        self.useHighPass.stateChanged.connect(lambda: self.toggle_parameters(self.useHighPass, self.highPassFrequency))
+        form_layout.addRow(self.useHighPass, QLabel('HighPass Frequency:'))
+        form_layout.addRow(self.highPassFrequency)
 
         # Moving Average Filter
         self.useMovingAvg = QCheckBox('Use MovingAvg')
@@ -122,9 +123,9 @@ class SettingsTab(QWidget):
         advanced_layout.addRow(QLabel('Right Servo Pin:'), self.servoPinRight)
 
         # Additional Pin settings
-        self.sbusPin = QLineEdit('21')
-        self.mainMotorPin = QLineEdit('22')
-        self.tailMotorPin = QLineEdit('23')
+        self.sbusPin = QLineEdit('16')
+        self.mainMotorPin = QLineEdit('5')
+        self.tailMotorPin = QLineEdit('17')
         self.sdaPin = QLineEdit('21')
         self.sclPin = QLineEdit('22')
         advanced_layout.addRow(QLabel('SBUS Pin:'), self.sbusPin)
@@ -197,13 +198,16 @@ class SettingsTab(QWidget):
 
         # Sammle die Parameter
         parameter_string = f"rollPID={self.pidRollP.text()};pitchPID={self.pidPitchP.text()};yawPID={self.pidYawP.text()};" \
-                           f"lowPassAlpha={self.lowPassAlpha.text()};highPassAlpha={self.highPassAlpha.text()};" \
+                           f"lowPassFrequency={self.lowPassFrequency.text()};highPassFrequency={self.highPassFrequency.text()};" \
                            f"movingAvgWindowSize={self.movingAvgWindowSize.text()};kalmanQ={self.kalmanQ.text()};" \
                            f"kalmanR={self.kalmanR.text()};gyroOffsetX={self.gyroOffsetX.text()};gyroOffsetY={self.gyroOffsetY.text()};" \
                            f"gyroOffsetZ={self.gyroOffsetZ.text()};servoPinAft={self.servoPinAft.text()};servoPinLeft={self.servoPinLeft.text()};" \
                            f"servoPinRight={self.servoPinRight.text()};sbusPin={self.sbusPin.text()};mainMotorPin={self.mainMotorPin.text()};" \
                            f"tailMotorPin={self.tailMotorPin.text()};sdaPin={self.sdaPin.text()};sclPin={self.sclPin.text()};" \
-                           f"mpuCalibrationDuration={self.mpuCalibrationDuration.text()}\n"
+                           f"mpuCalibrationDuration={self.mpuCalibrationDuration.text()};" \
+                           f"useLowPass={self.useLowPass.isChecked()};useHighPass={self.useHighPass.isChecked()};" \
+                           f"useMovingAvg={self.useMovingAvg.isChecked()};useKalman={self.useKalman.isChecked()}\n"
+
 
         # Senden der Parameter
         ser.write(parameter_string.encode())
