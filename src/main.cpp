@@ -12,6 +12,7 @@
 #include "FilterHandler.h"
 #include "DataLogger.h"
 #include "ParameterHandler.h"
+#include "SerialHandler.h"
 
 
 // MPU
@@ -57,6 +58,7 @@ void setup() {
 void loop() {
     unsigned int channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel10Pulse;
 
+    processSerialData();
     resetWatchdog();
 
     if (!calibrationCompleted) {
