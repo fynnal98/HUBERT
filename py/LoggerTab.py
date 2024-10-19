@@ -49,6 +49,9 @@ class LoggerTab(QWidget):
         layout.addWidget(self.status_label)
         layout.addWidget(self.timer_label)
         layout.addWidget(self.timer_spinbox)
+
+        layout.addStretch()  # Fügt einen Spacer hinzu, der den Platz nach oben drückt
+
         self.setLayout(layout)
 
     def start_timer(self):

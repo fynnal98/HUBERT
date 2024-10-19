@@ -3,15 +3,18 @@
 
 class LowPassFilter {
 public:
-    // Constructor that takes the alpha coefficient as a parameter
-    LowPassFilter(float alpha);  
+    // Konstruktor mit Grenzfrequenz und Abtastrate
+    LowPassFilter(float cutoffFrequency, float sampleRate);
     
-    // Function to apply the filter to the current value
+    // Methode, um Grenzfrequenz und Abtastrate zu setzen
+    void setParameters(float cutoffFrequency, float sampleRate);
+    
+    // Methode, um den Filter auf den aktuellen Wert anzuwenden
     float apply(float currentValue);
 
 private:
-    float alpha;  // Filter coefficient
-    float previousValue;  // Stores the last filtered value
+    float alpha;           // Der berechnete Alpha-Wert für den Filter
+    float previousValue;    // Der vorherige gefilterte Wert
 };
 
-#endif // LOWPASSFILTER_H
+#endif

@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon
 from BodePlotTab import BodePlotTab
 from LoggerTab import LoggerTab
 from SettingsTab import SettingsTab
+from SystemTab import SystemTab
 
 class MainGUI(QMainWindow):
     def __init__(self):
@@ -18,10 +19,12 @@ class MainGUI(QMainWindow):
         self.logger_tab = LoggerTab()
         self.bode_plot_tab = BodePlotTab()
         self.setting_tab = SettingsTab()
+        self.system_tab = SystemTab()
 
         self.tabs.addTab(self.setting_tab, "Settings")
         self.tabs.addTab(self.logger_tab, "Logger")
         self.tabs.addTab(self.bode_plot_tab, "Bode Plot")
+        self.tabs.addTab(self.system_tab, "System")
 
         self.setCentralWidget(self.tabs)
 

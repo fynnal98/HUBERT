@@ -30,9 +30,12 @@ extern const int sbusPin;
 extern const int wireSDA;
 extern const int wireSCL;
 
+extern float sampleRate; 
+
 // Filterparameter
-extern float lowPassAlpha;
-extern float highPassAlpha;
+extern float lowPassCutoffFrequency;
+extern float highPassCutoffFrequency;
+
 extern int movingAvgWindowSize;
 extern float kalmanQ;
 extern float kalmanR;

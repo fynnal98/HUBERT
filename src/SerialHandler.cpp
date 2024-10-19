@@ -20,10 +20,10 @@ void processSerialData() {
             yawPIDFactor = extractParameterValue(input, "yawPID=");
         }
         if (input.indexOf("lowPassAlpha=") != -1) {
-            lowPassAlpha = extractParameterValue(input, "lowPassAlpha=");
+            lowPassCutoffFrequency = extractParameterValue(input, "lowPassAlpha=");
         }
         if (input.indexOf("highPassAlpha=") != -1) {
-            highPassAlpha = extractParameterValue(input, "highPassAlpha=");
+            highPassCutoffFrequency = extractParameterValue(input, "highPassAlpha=");
         }
         if (input.indexOf("movingAvgWindowSize=") != -1) {
             movingAvgWindowSize = (int)extractParameterValue(input, "movingAvgWindowSize=");

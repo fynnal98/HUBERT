@@ -20,7 +20,7 @@ void MPU6050::begin() {
     
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(MPU6050_SMPLRT_DIV);
-    Wire.write(0x00); 
+    Wire.write(0x00); //das heißt 1000hz
     Wire.endTransmission();
     
     mpuConnected = true;  // Initialisiere mpuConnected auf true, wenn alles funktioniert

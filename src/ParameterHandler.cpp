@@ -27,9 +27,13 @@ const int sbusPin = 16;
 const int wireSDA = 21;
 const int wireSCL = 22;
 
-// Filterparameter
-float lowPassAlpha = 0.4;
-float highPassAlpha = 0.999;
+// Abtastrate des MPU6050 (in Hz)
+float sampleRate = 1000.0;  // Fester Parameter für die Abtastrate
+
+// Filterfrequenzen (statt der Alpha-Werte)
+float lowPassCutoffFrequency = 100;  // Grenzfrequenz des Low-Pass-Filters in Hz
+float highPassCutoffFrequency = 1; // Grenzfrequenz des High-Pass-Filters in Hz
+
 int movingAvgWindowSize = 5;
 float kalmanQ = 0.02;
 float kalmanR = 0.2;
@@ -42,9 +46,9 @@ float bandwidth = 10.0;
 
 // Flags, um Filter zu aktivieren oder deaktivieren
 bool useLowPass = true;
-bool useHighPass = true;
+bool useHighPass = false;
 bool useMovingAvg = false;
-bool useKalman = true;
+bool useKalman = false;
 bool useRPMFilter = false; 
 
 // CG-Offsets für den MPU

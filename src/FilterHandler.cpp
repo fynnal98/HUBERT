@@ -2,14 +2,20 @@
 #include "ParameterHandler.h"
 #include "DataLogger.h"
 
+#include "FilterHandler.h"
+#include "ParameterHandler.h"
+#include "DataLogger.h"
+
 // Konstruktor: Initialisiert alle Filter und den PID-Regler
-FilterHandler::FilterHandler(float lowPassAlpha, float highPassAlpha, int movingAvgWindowSize, float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate, PID& pid)
-    : lowPassFilter(lowPassAlpha), highPassFilter(highPassAlpha),
+FilterHandler::FilterHandler(float lowPassCutoffFrequency, float highPassCutoffFrequency, int movingAvgWindowSize, float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate, PID& pid)
+    : lowPassFilter(lowPassCutoffFrequency, sampleRate),  // Verwende sampleRate aus dem ParameterHandler
+      highPassFilter(highPassCutoffFrequency, sampleRate), 
       movingAvgFilter(movingAvgWindowSize), kalmanFilter(kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate),
       rpmFilter(), pid(pid) {
     // Setze initial RPM für den RPM-Filter
     rpmFilter.setRPM(getRPM());
 }
+
 
 // Filter anwenden und das Ergebnis loggen
 float FilterHandler::apply(float value, bool useLowPass, bool useHighPass, bool useMovingAvg, bool useKalman, bool useRPMFilter, DataLogger& logger) {

@@ -8,7 +8,11 @@ class SettingsTab(QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QVBoxLayout()
+        # Hauptlayout mit zwei Spalten (QHBoxLayout)
+        main_layout = QHBoxLayout()
+
+        # Links: Filter und PID Settings
+        left_layout = QVBoxLayout()
 
         # Filters Section
         form_layout = QFormLayout()
@@ -99,10 +103,12 @@ class SettingsTab(QWidget):
         form_layout.addRow(QLabel('Gyro Offset Y:'), self.gyroOffsetY)
         form_layout.addRow(QLabel('Gyro Offset Z:'), self.gyroOffsetZ)
 
-        # Add the form layout to the main layout
-        layout.addLayout(form_layout)
+        # Füge das form_layout zu left_layout hinzu
+        left_layout.addLayout(form_layout)
 
-        # Advanced Settings Section
+        # Rechts: Advanced Settings
+        right_layout = QVBoxLayout()
+
         advanced_layout = QFormLayout()
         advanced_label = QLabel("<b>Advanced Settings</b>")
         advanced_layout.addRow(advanced_label)
@@ -135,15 +141,19 @@ class SettingsTab(QWidget):
         self.comPort = QLineEdit('COM5')  # Default COM Port
         advanced_layout.addRow(QLabel('COM Port:'), self.comPort)
 
-        # Add advanced settings layout to the main layout
-        layout.addLayout(advanced_layout)
+        # Füge das advanced_layout zu right_layout hinzu
+        right_layout.addLayout(advanced_layout)
 
-        # Save Button
+        # Save Button (in der rechten Spalte)
         save_button = QPushButton('Save Parameters')
         save_button.clicked.connect(self.save_parameters)
-        layout.addWidget(save_button)
+        right_layout.addWidget(save_button)
 
-        self.setLayout(layout)
+        # Füge die beiden Layouts (links und rechts) zum Hauptlayout hinzu
+        main_layout.addLayout(left_layout)
+        main_layout.addLayout(right_layout)
+
+        self.setLayout(main_layout)
         self.setWindowTitle('Settings Tab')
 
     def toggle_sync_roll_pitch(self):

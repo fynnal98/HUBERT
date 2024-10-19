@@ -48,7 +48,7 @@ class BodePlotTab(QWidget):
         self.raw_y = None
         self.filtered_x = None
         self.filtered_y = None
-        self.sampling_rate = 320.0  # Standard-Abtastrate
+        self.sampling_rate = 1000.0  # Standard-Abtastrate
 
         # UI Elements
         self.label = QLabel("Load a CSV file to generate Bode plots", self)
