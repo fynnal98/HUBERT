@@ -30,8 +30,8 @@ FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, 
 
 // Motoren
 MainMotor mainMotorServo(mainMotorPin);
-TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw);  // Tailrotor-Faktor
-SBUSReceiver sbusReceiver(Serial2);  // Initialisiere mit Serial2
+TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw); 
+SBUSReceiver sbusReceiver(Serial2); 
 
 void setup() {
     Serial.begin(115200);
@@ -41,7 +41,7 @@ void setup() {
 
     initWatchdog(2);
     sbusReceiver.begin();
-    Wire.begin(wireSDA, wireSCL);  // Verwende die Pins für SDA und SCL aus dem ParameterHandler
+    Wire.begin(wireSDA, wireSCL);  
     mpu.begin();
     mpu.setup();
 

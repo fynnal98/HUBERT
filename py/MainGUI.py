@@ -1,10 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
 from PyQt5.QtGui import QIcon
-from BodePlotTab import BodePlotTab
-from LoggerTab import LoggerTab
-from SettingsTab import SettingsTab
-from SystemTab import SystemTab
+from tabs.BodePlotTab import BodePlotTab
+from tabs.LoggerTab import LoggerTab
+from tabs.SettingsTab import SettingsTab
+from tabs.SystemTab import SystemTab
 
 class MainGUI(QMainWindow):
     def __init__(self):
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
 
-    with open('py/style.qss', 'r') as file:
+    with open('py/qss/style.qss', 'r') as file:
         style_sheet = file.read()
         app.setStyleSheet(style_sheet)
 

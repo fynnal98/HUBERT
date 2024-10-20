@@ -1,6 +1,6 @@
 import sys
 import serial
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QFormLayout, QPushButton, QCheckBox, QLineEdit, QLabel, QHBoxLayout, QMessageBox)
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QFormLayout, QPushButton, QCheckBox, QLineEdit, QLabel, QHBoxLayout, QMessageBox, QGroupBox)
 
 class SettingsTab(QWidget):
     def __init__(self):
@@ -14,35 +14,33 @@ class SettingsTab(QWidget):
         # Links: Filter und PID Settings
         left_layout = QVBoxLayout()
 
-        # Filters Section
-        form_layout = QFormLayout()
-        filter_label = QLabel("<b>Filter Settings</b>")
-        form_layout.addRow(filter_label)
+        # Filters Section in GroupBox
+        filter_group = QGroupBox("Filter Settings")
+        filter_group_layout = QFormLayout()
 
-        # LowPass Filter 
+        # LowPass Filter
         self.useLowPass = QCheckBox('Use LowPass')
         self.lowPassFrequency = QLineEdit('0.2')  # This is now Frequency instead of Alpha
         self.lowPassFrequency.setEnabled(False)  # Initially disabled
         self.useLowPass.stateChanged.connect(lambda: self.toggle_parameters(self.useLowPass, self.lowPassFrequency))
-        form_layout.addRow(self.useLowPass, QLabel('LowPass Frequency:'))
-        form_layout.addRow(self.lowPassFrequency)
-
+        filter_group_layout.addRow(self.useLowPass, QLabel('LowPass Frequency:'))
+        filter_group_layout.addRow(self.lowPassFrequency)
 
         # HighPass Filter 
         self.useHighPass = QCheckBox('Use HighPass')
         self.highPassFrequency = QLineEdit('0.999')  # Frequency für HighPass
         self.highPassFrequency.setEnabled(False)  # Initially disabled
         self.useHighPass.stateChanged.connect(lambda: self.toggle_parameters(self.useHighPass, self.highPassFrequency))
-        form_layout.addRow(self.useHighPass, QLabel('HighPass Frequency:'))
-        form_layout.addRow(self.highPassFrequency)
+        filter_group_layout.addRow(self.useHighPass, QLabel('HighPass Frequency:'))
+        filter_group_layout.addRow(self.highPassFrequency)
 
         # Moving Average Filter
         self.useMovingAvg = QCheckBox('Use MovingAvg')
         self.movingAvgWindowSize = QLineEdit('2')
         self.movingAvgWindowSize.setEnabled(False)  # Initially disabled
         self.useMovingAvg.stateChanged.connect(lambda: self.toggle_parameters(self.useMovingAvg, self.movingAvgWindowSize))
-        form_layout.addRow(self.useMovingAvg, QLabel('MovingAvg Window Size:'))
-        form_layout.addRow(self.movingAvgWindowSize)
+        filter_group_layout.addRow(self.useMovingAvg, QLabel('MovingAvg Window Size:'))
+        filter_group_layout.addRow(self.movingAvgWindowSize)
 
         # Kalman Filter
         self.useKalman = QCheckBox('Use Kalman')
@@ -51,76 +49,98 @@ class SettingsTab(QWidget):
         self.kalmanQ.setEnabled(False)  # Initially disabled
         self.kalmanR.setEnabled(False)  # Initially disabled
         self.useKalman.stateChanged.connect(lambda: self.toggle_parameters(self.useKalman, self.kalmanQ, self.kalmanR))
-        form_layout.addRow(self.useKalman, QLabel('Kalman Q:'))
-        form_layout.addRow(self.kalmanQ)
-        form_layout.addRow(QLabel('Kalman R:'))
-        form_layout.addRow(self.kalmanR)
+        filter_group_layout.addRow(self.useKalman, QLabel('Kalman Q:'))
+        filter_group_layout.addRow(self.kalmanQ)
+        filter_group_layout.addRow(QLabel('Kalman R:'))
+        filter_group_layout.addRow(self.kalmanR)
 
-        # PID Section
-        pid_label = QLabel("<b>PID Settings</b>")
-        form_layout.addRow(pid_label)
+        # RPM Filter
+        self.useRPMFilter = QCheckBox('Use RPM Filter')
+        self.rpm = QLineEdit('20000')  # Default RPM
+        self.bandwidth = QLineEdit('10.0')  # Default Bandwidth
+        self.rpm.setEnabled(False)  # Initially disabled
+        self.bandwidth.setEnabled(False)  # Initially disabled
+        self.useRPMFilter.stateChanged.connect(lambda: self.toggle_parameters(self.useRPMFilter, self.rpm, self.bandwidth))
+        filter_group_layout.addRow(self.useRPMFilter, QLabel('RPM:'))
+        filter_group_layout.addRow(self.rpm)
+        filter_group_layout.addRow(QLabel('Bandwidth:'))
+        filter_group_layout.addRow(self.bandwidth)
+
+        filter_group.setLayout(filter_group_layout)
+        left_layout.addWidget(filter_group)
+
+        # PID Section in GroupBox
+        pid_group = QGroupBox("PID Settings")
+        pid_group_layout = QFormLayout()
 
         # Roll PID
         self.pidRollP = QLineEdit('80.0')
         self.pidRollI = QLineEdit('0.0')
         self.pidRollD = QLineEdit('20')
         self.factorRoll = QLineEdit('1.0')  # Factor for Roll
-        form_layout.addRow(QLabel('Roll P:'), self.pidRollP)
-        form_layout.addRow(QLabel('Roll I:'), self.pidRollI)
-        form_layout.addRow(QLabel('Roll D:'), self.pidRollD)
-        form_layout.addRow(QLabel('Roll Factor:'), self.factorRoll)
+        pid_group_layout.addRow(QLabel('Roll P:'), self.pidRollP)
+        pid_group_layout.addRow(QLabel('Roll I:'), self.pidRollI)
+        pid_group_layout.addRow(QLabel('Roll D:'), self.pidRollD)
+        pid_group_layout.addRow(QLabel('Roll Factor:'), self.factorRoll)
 
         # Pitch PID
         self.syncRollPitch = QCheckBox('Roll & Pitch sync')
         self.syncRollPitch.stateChanged.connect(self.toggle_sync_roll_pitch)
-        form_layout.addRow(self.syncRollPitch)
+        pid_group_layout.addRow(self.syncRollPitch)
 
         self.pidPitchP = QLineEdit('80.0')
         self.pidPitchI = QLineEdit('0.0')
         self.pidPitchD = QLineEdit('20')
         self.factorPitch = QLineEdit('1.0')  # Factor for Pitch
-        form_layout.addRow(QLabel('Pitch P:'), self.pidPitchP)
-        form_layout.addRow(QLabel('Pitch I:'), self.pidPitchI)
-        form_layout.addRow(QLabel('Pitch D:'), self.pidPitchD)
-        form_layout.addRow(QLabel('Pitch Factor:'), self.factorPitch)
+        pid_group_layout.addRow(QLabel('Pitch P:'), self.pidPitchP)
+        pid_group_layout.addRow(QLabel('Pitch I:'), self.pidPitchI)
+        pid_group_layout.addRow(QLabel('Pitch D:'), self.pidPitchD)
+        pid_group_layout.addRow(QLabel('Pitch Factor:'), self.factorPitch)
 
         # Yaw PID
         self.pidYawP = QLineEdit('90.0')
         self.pidYawI = QLineEdit('0.0')
         self.pidYawD = QLineEdit('5')
         self.factorYaw = QLineEdit('1.0')  # Factor for Yaw
-        form_layout.addRow(QLabel('Yaw P:'), self.pidYawP)
-        form_layout.addRow(QLabel('Yaw I:'), self.pidYawI)
-        form_layout.addRow(QLabel('Yaw D:'), self.pidYawD)
-        form_layout.addRow(QLabel('Yaw Factor:'), self.factorYaw)
+        pid_group_layout.addRow(QLabel('Yaw P:'), self.pidYawP)
+        pid_group_layout.addRow(QLabel('Yaw I:'), self.pidYawI)
+        pid_group_layout.addRow(QLabel('Yaw D:'), self.pidYawD)
+        pid_group_layout.addRow(QLabel('Yaw Factor:'), self.factorYaw)
 
-        # Gyro Offset
-        gyro_offset_label = QLabel("<b>Gyro Offset</b>")
-        form_layout.addRow(gyro_offset_label)
+        pid_group.setLayout(pid_group_layout)
+        left_layout.addWidget(pid_group)
+
+        # Füge das left_layout zu main_layout hinzu
+        main_layout.addLayout(left_layout)
+
+        # Rechts: Advanced Settings in GroupBox
+        right_layout = QVBoxLayout()
+
+        # Gyro Offset Section in GroupBox
+        gyro_group = QGroupBox("Gyro Offset")
+        gyro_group_layout = QFormLayout()
+
         self.gyroOffsetX = QLineEdit('0.0')
         self.gyroOffsetY = QLineEdit('0.0')
         self.gyroOffsetZ = QLineEdit('0.0')
-        form_layout.addRow(QLabel('Gyro Offset X:'), self.gyroOffsetX)
-        form_layout.addRow(QLabel('Gyro Offset Y:'), self.gyroOffsetY)
-        form_layout.addRow(QLabel('Gyro Offset Z:'), self.gyroOffsetZ)
+        gyro_group_layout.addRow(QLabel('Gyro Offset X:'), self.gyroOffsetX)
+        gyro_group_layout.addRow(QLabel('Gyro Offset Y:'), self.gyroOffsetY)
+        gyro_group_layout.addRow(QLabel('Gyro Offset Z:'), self.gyroOffsetZ)
 
-        # Füge das form_layout zu left_layout hinzu
-        left_layout.addLayout(form_layout)
+        gyro_group.setLayout(gyro_group_layout)
+        right_layout.addWidget(gyro_group)
 
-        # Rechts: Advanced Settings
-        right_layout = QVBoxLayout()
-
-        advanced_layout = QFormLayout()
-        advanced_label = QLabel("<b>Advanced Settings</b>")
-        advanced_layout.addRow(advanced_label)
+        # Advanced Settings in GroupBox
+        advanced_group = QGroupBox("Advanced Settings")
+        advanced_group_layout = QFormLayout()
 
         # Servo Pin settings
         self.servoPinAft = QLineEdit('13')  # Aft Servo Pin
         self.servoPinLeft = QLineEdit('14')  # Left Servo Pin
         self.servoPinRight = QLineEdit('15')  # Right Servo Pin
-        advanced_layout.addRow(QLabel('Aft Servo Pin:'), self.servoPinAft)
-        advanced_layout.addRow(QLabel('Left Servo Pin:'), self.servoPinLeft)
-        advanced_layout.addRow(QLabel('Right Servo Pin:'), self.servoPinRight)
+        advanced_group_layout.addRow(QLabel('Aft Servo Pin:'), self.servoPinAft)
+        advanced_group_layout.addRow(QLabel('Left Servo Pin:'), self.servoPinLeft)
+        advanced_group_layout.addRow(QLabel('Right Servo Pin:'), self.servoPinRight)
 
         # Additional Pin settings
         self.sbusPin = QLineEdit('16')
@@ -128,30 +148,32 @@ class SettingsTab(QWidget):
         self.tailMotorPin = QLineEdit('17')
         self.sdaPin = QLineEdit('21')
         self.sclPin = QLineEdit('22')
-        advanced_layout.addRow(QLabel('SBUS Pin:'), self.sbusPin)
-        advanced_layout.addRow(QLabel('Main Motor Pin:'), self.mainMotorPin)
-        advanced_layout.addRow(QLabel('Tail Motor Pin:'), self.tailMotorPin)
-        advanced_layout.addRow(QLabel('SDA Pin:'), self.sdaPin)
-        advanced_layout.addRow(QLabel('SCL Pin:'), self.sclPin)
+        advanced_group_layout.addRow(QLabel('SBUS Pin:'), self.sbusPin)
+        advanced_group_layout.addRow(QLabel('Main Motor Pin:'), self.mainMotorPin)
+        advanced_group_layout.addRow(QLabel('Tail Motor Pin:'), self.tailMotorPin)
+        advanced_group_layout.addRow(QLabel('SDA Pin:'), self.sdaPin)
+        advanced_group_layout.addRow(QLabel('SCL Pin:'), self.sclPin)
 
         # MPU Calibration Duration
         self.mpuCalibrationDuration = QLineEdit('1000')  # Calibration duration for MPU
-        advanced_layout.addRow(QLabel('MPU Calibration Duration (ms):'), self.mpuCalibrationDuration)
+        advanced_group_layout.addRow(QLabel('MPU Calibration Duration (ms):'), self.mpuCalibrationDuration)
 
         # COM Port Setting
         self.comPort = QLineEdit('COM5')  # Default COM Port
-        advanced_layout.addRow(QLabel('COM Port:'), self.comPort)
+        advanced_group_layout.addRow(QLabel('COM Port:'), self.comPort)
 
-        # Füge das advanced_layout zu right_layout hinzu
-        right_layout.addLayout(advanced_layout)
+        advanced_group.setLayout(advanced_group_layout)
+        right_layout.addWidget(advanced_group)
+
+        # Spacer hinzufügen, um alles nach oben zu schieben
+        right_layout.addStretch()
 
         # Save Button (in der rechten Spalte)
         save_button = QPushButton('Save Parameters')
         save_button.clicked.connect(self.save_parameters)
         right_layout.addWidget(save_button)
 
-        # Füge die beiden Layouts (links und rechts) zum Hauptlayout hinzu
-        main_layout.addLayout(left_layout)
+        # Füge das right_layout zu main_layout hinzu
         main_layout.addLayout(right_layout)
 
         self.setLayout(main_layout)
@@ -165,12 +187,12 @@ class SettingsTab(QWidget):
             self.pidPitchI.setEnabled(False)
             self.pidPitchD.setEnabled(False)
             self.factorPitch.setEnabled(False)
-            
+
             self.pidPitchP.setText(self.pidRollP.text())
             self.pidPitchI.setText(self.pidRollI.text())
             self.pidPitchD.setText(self.pidRollD.text())
             self.factorPitch.setText(self.factorRoll.text())
-            
+
             # Sync Roll and Pitch when Roll inputs change
             self.pidRollP.textChanged.connect(lambda: self.pidPitchP.setText(self.pidRollP.text()))
             self.pidRollI.textChanged.connect(lambda: self.pidPitchI.setText(self.pidRollI.text()))
@@ -206,7 +228,8 @@ class SettingsTab(QWidget):
                            f"tailMotorPin={self.tailMotorPin.text()};sdaPin={self.sdaPin.text()};sclPin={self.sclPin.text()};" \
                            f"mpuCalibrationDuration={self.mpuCalibrationDuration.text()};" \
                            f"useLowPass={self.useLowPass.isChecked()};useHighPass={self.useHighPass.isChecked()};" \
-                           f"useMovingAvg={self.useMovingAvg.isChecked()};useKalman={self.useKalman.isChecked()}\n"
+                           f"useMovingAvg={self.useMovingAvg.isChecked()};useKalman={self.useKalman.isChecked()};" \
+                           f"rpm={self.rpm.text()};bandwidth={self.bandwidth.text()};useRPMFilter={self.useRPMFilter.isChecked()}\n"
 
 
         # Senden der Parameter
