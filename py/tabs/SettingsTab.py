@@ -1,6 +1,7 @@
 import sys
-import serial
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QFormLayout, QPushButton, QCheckBox, QLineEdit, QLabel, QHBoxLayout, QMessageBox, QGroupBox)
+import esptool
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QFormLayout, QPushButton, QCheckBox, QLineEdit, QLabel, 
+                             QHBoxLayout, QMessageBox, QGroupBox, QTextEdit)
 
 class SettingsTab(QWidget):
     def __init__(self):
@@ -168,10 +169,15 @@ class SettingsTab(QWidget):
         # Spacer hinzufügen, um alles nach oben zu schieben
         right_layout.addStretch()
 
-        # Save Button (in der rechten Spalte)
-        save_button = QPushButton('Save Parameters')
-        save_button.clicked.connect(self.save_parameters)
-        right_layout.addWidget(save_button)
+        # Flash Button (in der rechten Spalte)
+        flash_button = QPushButton('Flash ESP32')
+        flash_button.clicked.connect(self.flash_esp)
+        right_layout.addWidget(flash_button)
+
+        # Terminal-Ausgabeanzeige
+        self.output_console = QTextEdit(self)
+        self.output_console.setReadOnly(True)
+        right_layout.addWidget(self.output_console)
 
         # Füge das right_layout zu main_layout hinzu
         main_layout.addLayout(right_layout)
@@ -210,33 +216,30 @@ class SettingsTab(QWidget):
         for widget in widgets:
             widget.setEnabled(checkbox.isChecked())
 
-    def save_parameters(self):
-        # Verbindung über USB herstellen
+
+
+
+    def flash_esp(self):
         try:
-            ser = serial.Serial(self.comPort.text(), 115200, timeout=1)
-        except serial.SerialException as e:
-            QMessageBox.critical(self, "Error", f"Failed to open serial port: {e}")
-            return
+            esp_port = self.comPort.text()  # Den COM-Port aus der GUI entnehmen
+            firmware_file = "C:/Users/Fynn/Desktop/Git/HUBERT/.pio/build/esp32dev/firmware.bin"  # Der korrekte Pfad zur Firmware
 
-        # Sammle die Parameter
-        parameter_string = f"rollPID={self.pidRollP.text()};pitchPID={self.pidPitchP.text()};yawPID={self.pidYawP.text()};" \
-                           f"lowPassFrequency={self.lowPassFrequency.text()};highPassFrequency={self.highPassFrequency.text()};" \
-                           f"movingAvgWindowSize={self.movingAvgWindowSize.text()};kalmanQ={self.kalmanQ.text()};" \
-                           f"kalmanR={self.kalmanR.text()};gyroOffsetX={self.gyroOffsetX.text()};gyroOffsetY={self.gyroOffsetY.text()};" \
-                           f"gyroOffsetZ={self.gyroOffsetZ.text()};servoPinAft={self.servoPinAft.text()};servoPinLeft={self.servoPinLeft.text()};" \
-                           f"servoPinRight={self.servoPinRight.text()};sbusPin={self.sbusPin.text()};mainMotorPin={self.mainMotorPin.text()};" \
-                           f"tailMotorPin={self.tailMotorPin.text()};sdaPin={self.sdaPin.text()};sclPin={self.sclPin.text()};" \
-                           f"mpuCalibrationDuration={self.mpuCalibrationDuration.text()};" \
-                           f"useLowPass={self.useLowPass.isChecked()};useHighPass={self.useHighPass.isChecked()};" \
-                           f"useMovingAvg={self.useMovingAvg.isChecked()};useKalman={self.useKalman.isChecked()};" \
-                           f"rpm={self.rpm.text()};bandwidth={self.bandwidth.text()};useRPMFilter={self.useRPMFilter.isChecked()}\n"
+            esptool.main([
+                "--chip", "esp32",
+                "--port", esp_port,
+                "--baud", "115200",
+                "write_flash", "-z", "0x1000", firmware_file
+            ])
+
+            self.output_console.append("ESP32 wurde erfolgreich geflasht!")
+            QMessageBox.information(self, "Erfolg", "ESP32 wurde erfolgreich geflasht!")
+
+        except Exception as e:
+            self.output_console.append(f"Fehler beim Flashen: {e}")
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Flashen: {e}")
 
 
-        # Senden der Parameter
-        ser.write(parameter_string.encode())
-        ser.close()
 
-        QMessageBox.information(self, "Success", "Parameters were sent successfully!")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
