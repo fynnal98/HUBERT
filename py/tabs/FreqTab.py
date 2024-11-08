@@ -6,13 +6,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QLabel, QLineEdit, QHBoxLayout, QSpacerItem, QSizePolicy
 
 
-class BodePlotCanvas(FigureCanvas):
+class FreqPlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig, (self.ax1, self.ax2) = plt.subplots(2, 1, figsize=(width, height), dpi=dpi)
-        super(BodePlotCanvas, self).__init__(fig)
+        super(FreqPlotCanvas, self).__init__(fig)
         self.setParent(parent)
 
-    def plot_bode(self, freq, magnitude_x, magnitude_y, phase_x, phase_y, title, max_freq):
+    def plot_freq(self, freq, magnitude_x, magnitude_y, phase_x, phase_y, title, max_freq):
         self.ax1.clear()
         self.ax2.clear()
 
@@ -40,7 +40,7 @@ class BodePlotCanvas(FigureCanvas):
         self.draw()
 
 
-class BodePlotTab(QWidget):
+class FreqPlotTab(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -51,13 +51,13 @@ class BodePlotTab(QWidget):
         self.sampling_rate = 1000.0  # Standard-Abtastrate
 
         # UI Elements
-        self.label = QLabel("Load a CSV file to generate Bode plots", self)
+        self.label = QLabel("Load a CSV file to generate plots", self)
         self.load_button = QPushButton("Load CSV", self)
         self.load_button.clicked.connect(self.load_csv)
 
         # Create canvases for raw and filtered data
-        self.raw_canvas = BodePlotCanvas(self, width=5, height=10)
-        self.filtered_canvas = BodePlotCanvas(self, width=5, height=10)
+        self.raw_canvas = FreqPlotCanvas(self, width=5, height=10)
+        self.filtered_canvas = FreqPlotCanvas(self, width=5, height=10)
 
         # Abtastrate Eingabe
         self.sampling_rate_label = QLabel(f"Sampling Rate (Hz):", self)
@@ -97,7 +97,7 @@ class BodePlotTab(QWidget):
             self.sampling_rate = float(self.sampling_rate_input.text())
             nyquist_freq = self.sampling_rate / 2
             self.nyquist_label.setText(f"Max Frequency (Nyquist): {nyquist_freq:.2f} Hz")
-            # Bode-Diagramme neu plotten, wenn Daten vorhanden sind
+
             if self.raw_x is not None and self.raw_y is not None:
                 self.process_data()
         except ValueError:
@@ -145,5 +145,5 @@ class BodePlotTab(QWidget):
         max_freq = self.sampling_rate / 2
 
         # Plot aktualisieren
-        self.raw_canvas.plot_bode(freq, magnitude_x_raw, magnitude_y_raw, phase_x_raw, phase_y_raw, "Raw Data (X, Y)", max_freq)
-        self.filtered_canvas.plot_bode(freq, magnitude_x_filtered, magnitude_y_filtered, phase_x_filtered, phase_y_filtered, "Filtered Data (X, Y)", max_freq)
+        self.raw_canvas.plot_freq(freq, magnitude_x_raw, magnitude_y_raw, phase_x_raw, phase_y_raw, "Raw Data (X, Y)", max_freq)
+        self.filtered_canvas.plot_freq(freq, magnitude_x_filtered, magnitude_y_filtered, phase_x_filtered, phase_y_filtered, "Filtered Data (X, Y)", max_freq)

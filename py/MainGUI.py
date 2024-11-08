@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
 from PyQt5.QtGui import QIcon
-from tabs.BodePlotTab import BodePlotTab
+from tabs.FreqTab import FreqPlotTab
 from tabs.LoggerTab import LoggerTab
 from tabs.SettingsTab import SettingsTab
 from tabs.SystemTab import SystemTab
@@ -17,13 +17,13 @@ class MainGUI(QMainWindow):
 
         # Add Logger, Bode Plot, and Settings tabs
         self.logger_tab = LoggerTab()
-        self.bode_plot_tab = BodePlotTab()
+        self.freq_plot_tab = FreqPlotTab()
         self.setting_tab = SettingsTab()
         self.system_tab = SystemTab()
 
         self.tabs.addTab(self.setting_tab, "Settings")
         self.tabs.addTab(self.logger_tab, "Logger")
-        self.tabs.addTab(self.bode_plot_tab, "Bode Plot")
+        self.tabs.addTab(self.freq_plot_tab, "Frequenz Plot")
         self.tabs.addTab(self.system_tab, "System")
 
         self.setCentralWidget(self.tabs)
