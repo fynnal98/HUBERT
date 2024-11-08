@@ -2,6 +2,8 @@
 #define MPU6050CALIBRATION_H
 
 #include "MPU6050.h"
+#include "ParameterHandler.h"
+#include <Arduino.h>
 
 class MPU6050Calibration {
 public:

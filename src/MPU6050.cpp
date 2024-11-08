@@ -1,32 +1,51 @@
 #include "MPU6050.h"
 #include "DataLogger.h"
+#include "ParameterHandler.h"  // Um auf den LED-Pin zuzugreifen
 
 #define MPU6050_ADDRESS 0x68  
 #define MPU6050_SMPLRT_DIV 0x19  
 
-MPU6050::MPU6050() : mpu(), cgOffsetX(0.0), cgOffsetY(0.0), cgOffsetZ(0.0), mpuConnected(true) {}  // Initialisiere mpuConnected
+extern int ledPin;
+
+MPU6050::MPU6050() : mpu(), cgOffsetX(0.0), cgOffsetY(0.0), cgOffsetZ(0.0), mpuConnected(true) {}
 
 void MPU6050::begin() {
     if (!mpu.begin()) {
         Serial.println("Failed to find MPU6050 chip");
         mpuConnected = false;  // Setze mpuConnected auf false, wenn die Initialisierung fehlschlägt
-        while (1) {
-            delay(10);
-        }
+    } else {
+        mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
+        mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
+        mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
+        
+        Wire.beginTransmission(MPU6050_ADDRESS);
+        Wire.write(MPU6050_SMPLRT_DIV);
+        Wire.write(0x00); // das heißt 1000hz
+        Wire.endTransmission();
+
+        mpuConnected = true;
     }
-    mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
-    mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
-    mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
-    
-    Wire.beginTransmission(MPU6050_ADDRESS);
-    Wire.write(MPU6050_SMPLRT_DIV);
-    Wire.write(0x00); //das heißt 1000hz
-    Wire.endTransmission();
-    
-    mpuConnected = true;  // Initialisiere mpuConnected auf true, wenn alles funktioniert
+
+    pinMode(ledPin, OUTPUT);  // Initialisiere den LED-Pin
 }
 
-void MPU6050::setup() {}
+void MPU6050::checkConnectionAndBlink() {
+    if (!mpuConnected) {
+        Serial.println("Verbindung zum MPU6050 verloren. Versuche erneut...");
+        while (!mpuConnected) {
+            digitalWrite(ledPin, HIGH);
+            delay(500);
+            digitalWrite(ledPin, LOW);
+            delay(500);
+
+            // Versuche, die Verbindung wiederherzustellen
+            mpuConnected = mpu.begin();
+            if (mpuConnected) {
+                Serial.println("Verbindung zum MPU6050 wiederhergestellt.");
+            }
+        }
+    }
+}
 
 void MPU6050::getEvent(sensors_event_t* a, sensors_event_t* g, sensors_event_t* temp) {
     if (mpu.getEvent(a, g, temp)) {
@@ -55,7 +74,6 @@ void MPU6050::setCGOffsets(float offsetX, float offsetY, float offsetZ) {
     this->cgOffsetZ = offsetZ;
 }
 
-// Neue Methode, um den Verbindungsstatus des MPU zu überprüfen
 bool MPU6050::isConnected() const {
     return mpuConnected;
 }

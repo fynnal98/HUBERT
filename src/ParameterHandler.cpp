@@ -5,6 +5,10 @@ int pinServo1 = 13;
 int pinServo2 = 14;
 int pinServo3 = 15;
 
+// In ParameterHandler.cpp
+int ledPin = 2;  // Standardwert für den LED-Pin
+
+
 // PID-Controller
 PID pidRoll(90.0, 0.0, 10, integralLimit, rollPIDFactor);
 PID pidPitch(90.0, 0.0, 10, integralLimit, pitchPIDFactor);
@@ -31,7 +35,7 @@ const int wireSCL = 22;
 float sampleRate = 1000.0;  // Fester Parameter für die Abtastrate
 
 // Filterfrequenzen (statt der Alpha-Werte)
-float lowPassCutoffFrequency = 40;  // Grenzfrequenz des Low-Pass-Filters in Hz
+float lowPassCutoffFrequency = 60;  // Grenzfrequenz des Low-Pass-Filters in Hz
 float highPassCutoffFrequency = 100; // Grenzfrequenz des High-Pass-Filters in Hz
 
 int movingAvgWindowSize = 5;
@@ -65,12 +69,11 @@ float gyroDriftOffsetZ = 0.0;
 const int calibrationDuration = 1000;
 
 // Kalibrierungsstatus
-bool calibrationCompleted = false;  // Setze den initialen Status auf 'false'
+bool calibrationCompleted = false;  
 
 
 
 void initializeParameters() {
-    // Falls zusätzliche Initialisierungslogik benötigt wird, kann sie hier hinzugefügt werden.
 }
 
 void setRPM(int newRPM) {

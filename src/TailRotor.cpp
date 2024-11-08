@@ -2,15 +2,26 @@
 
 // Konstruktor: Übergibt Pin, Skalierungsfaktor und den bereits erstellten PID-Regler
 TailRotor::TailRotor(int motorPin, float scaleFactor, PID& pidYaw)
-    : motorPin(motorPin), scaleFactor(scaleFactor), pidYaw(pidYaw) {}  // Verwendet den PID-Regler aus der Main
+    : motorPin(motorPin), scaleFactor(scaleFactor), pidYaw(pidYaw), correctionEnabled(true) {}  // Standardmäßig Korrektur aktiviert
 
+// Setup-Funktion: Initialisiert den Servo und verbindet ihn mit dem Pin
 void TailRotor::setup() {
     motorServo.attach(motorPin);  // Servo an den angegebenen Pin anhängen
 }
 
+// Funktion, um die Korrektur zu aktivieren oder zu deaktivieren
+void TailRotor::setCorrectionEnabled(bool enabled) {
+    correctionEnabled = enabled;
+}
+
+// Update-Funktion: Wendet die Korrektur an, falls aktiviert
 void TailRotor::update(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawRate) {
-    // Berechnung der Yaw-Korrektur basierend auf Gyroskop-Daten
-    float yawCorrection = pidYaw.compute(0, yawRate);  // Verwende 0 als Sollwert (kein Yaw), yawRate als Istwert
+    float yawCorrection = 0;
+    
+    if (correctionEnabled) {
+        // Berechnung der Yaw-Korrektur basierend auf Gyroskop-Daten
+        yawCorrection = pidYaw.compute(0, yawRate);  // Verwende 0 als Sollwert (kein Yaw), yawRate als Istwert
+    }
 
     // Berechnung des PWM-Werts für den Heckrotor basierend auf Kanalwerten und Yaw-Korrektur
     unsigned long adjustedTailMotorPulse = computeTailMotorPulse(channel8Pulse, channel4Pulse, yawCorrection);
@@ -19,6 +30,7 @@ void TailRotor::update(unsigned long channel8Pulse, unsigned long channel4Pulse,
     motorServo.writeMicroseconds(adjustedTailMotorPulse);
 }
 
+// Berechnet den PWM-Wert für den Heckrotor und berücksichtigt manuelle Eingaben (Channel 4)
 unsigned long TailRotor::computeTailMotorPulse(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawCorrection) {
     unsigned long adjustedTailMotorPulse = channel8Pulse * scaleFactor + yawCorrection;
 

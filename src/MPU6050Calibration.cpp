@@ -1,4 +1,7 @@
 #include "MPU6050Calibration.h"
+#include "ParameterHandler.h"
+
+extern int ledPin;  // Verweis auf die globale Variable in ParameterHandler.cpp
 
 int MPU6050Calibration::calibrationStep = 0;
 int MPU6050Calibration::totalSamples = 0;
@@ -11,7 +14,9 @@ void MPU6050Calibration::beginCalibration(int numSamples) {
     totalSamples = numSamples;
     gyroXSum = 0;
     gyroYSum = 0;
-    gyroZSum = 0;
+
+    // Initialisiere die LED als Ausgang
+    pinMode(ledPin, OUTPUT);
 }
 
 bool MPU6050Calibration::updateCalibration(MPU6050& mpu, float& gyroXOffset, float& gyroYOffset, float& gyroZOffset) {
@@ -20,16 +25,23 @@ bool MPU6050Calibration::updateCalibration(MPU6050& mpu, float& gyroXOffset, flo
         gyroXOffset = gyroXSum / totalSamples;
         gyroYOffset = gyroYSum / totalSamples;
         gyroZOffset = gyroZSum / totalSamples;
-        
-        // Debug-Ausgabe, wenn die Kalibrierung abgeschlossen ist
-        Serial.println("Kalibrierung abgeschlossen");  // Hier wird angezeigt, dass die Kalibrierung fertig ist
-        return true;  // Kalibrierung abgeschlossen
+
+        Serial.println("Kalibrierung abgeschlossen");
+
+        // LED zweimal blinken lassen
+        for (int i = 0; i < 2; i++) {
+            digitalWrite(ledPin, HIGH);
+            delay(200);
+            digitalWrite(ledPin, LOW);
+            delay(200);
+        }
+
+        return true;
     }
 
     sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);  // Hole die aktuellen Sensordaten
+    mpu.getEvent(&a, &g, &temp);
 
-    // Summiere die Gyroskop-Daten für die Kalibrierung
     gyroXSum += g.gyro.x;
     gyroYSum += g.gyro.y;
     gyroZSum += g.gyro.z;
@@ -41,7 +53,7 @@ bool MPU6050Calibration::updateCalibration(MPU6050& mpu, float& gyroXOffset, flo
         Serial.println(calibrationStep);
     }
 
-    return false;  // Kalibrierung noch nicht abgeschlossen
+    return false;
 }
 
 void MPU6050Calibration::resetCalibration() {

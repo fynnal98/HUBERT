@@ -14,7 +14,6 @@
 #include "ParameterHandler.h"
 #include "SerialHandler.h"
 
-
 // MPU
 MPU6050 mpu;
 
@@ -43,7 +42,6 @@ void setup() {
     sbusReceiver.begin();
     Wire.begin(wireSDA, wireSCL);  
     mpu.begin();
-    mpu.setup();
 
     Serial.println("Starte Gyroskop-Kalibrierung...");
     MPU6050Calibration::beginCalibration(calibrationDuration);
@@ -60,6 +58,7 @@ void loop() {
 
     processSerialData();
     resetWatchdog();
+    mpu.checkConnectionAndBlink();
 
     if (!calibrationCompleted) {
         calibrationCompleted = MPU6050Calibration::updateCalibration(mpu, gyroDriftOffsetX, gyroDriftOffsetY, gyroDriftOffsetZ);
@@ -78,17 +77,18 @@ void loop() {
 
         // Prüfe, ob Channel 10 aktiviert ist und der MPU verbunden ist
         if (Util::correctionEnabled(channel10Pulse) && mpu.isConnected()) {
-            // Wende Korrekturen an
+            // Aktiviert die Korrektur für Swashplate und Heckrotor
             fbl.update(mpu, channel1Pulse, channel2Pulse, channel6Pulse, useLowPass, useHighPass, useMovingAvg, useKalman);
-            // Übergib die Z-Achse des Gyroskops an den TailRotor
+            tailRotor.setCorrectionEnabled(true);
             tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
         } else {
-            // Wenn keine Korrektur, direktes Ansteuern der Servos
+            // Deaktiviert die Korrektur und steuert die Servos direkt
             fbl.servo1.writeMicroseconds(channel2Pulse);
             fbl.servo2.writeMicroseconds(channel6Pulse);
             fbl.servo3.writeMicroseconds(channel1Pulse);
 
             // TailRotor ohne Korrektur ansteuern
+            tailRotor.setCorrectionEnabled(false);
             tailRotor.update(channel8Pulse, channel4Pulse, 0);
         }
 

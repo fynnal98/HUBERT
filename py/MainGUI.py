@@ -10,12 +10,10 @@ class MainGUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HUBERT | Flightcontroller")
-        self.setWindowIcon(QIcon('py/icons/icon.png'))  # Path to your icon file
+        self.setWindowIcon(QIcon('py/icons/icon.png'))  
 
-        # Tab widget
         self.tabs = QTabWidget()
 
-        # Add Logger, Bode Plot, and Settings tabs
         self.logger_tab = LoggerTab()
         self.freq_plot_tab = FreqPlotTab()
         self.setting_tab = SettingsTab()

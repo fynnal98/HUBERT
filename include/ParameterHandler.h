@@ -47,7 +47,7 @@ extern bool useLowPass;
 extern bool useHighPass;
 extern bool useMovingAvg;
 extern bool useKalman;
-extern bool useRPMFilter;  // Neu: Flag für RPM-Filter
+extern bool useRPMFilter;  // Flag für RPM-Filter
 
 // CG-Offsets für den MPU
 extern float cgOffsetX;
@@ -63,12 +63,14 @@ extern float gyroDriftOffsetZ;
 extern const int calibrationDuration;
 
 // Kalibrierungsstatus
-extern bool calibrationCompleted;  // Deklaration der externen Variable
+extern bool calibrationCompleted;
 
 // RPM-Filterparameter
 extern int rpm;
-extern float bandwidth;  
+extern float bandwidth;
 
+// LED-Pin für Statusanzeigen (wie z. B. Kalibrierung abgeschlossen)
+extern int ledPin;  // LED-Pin über ParameterHandler verwaltet
 
 void initializeParameters();
 void setRPM(int newRPM);
