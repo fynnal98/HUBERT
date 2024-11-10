@@ -32,7 +32,7 @@ void TailRotor::update(unsigned long channel8Pulse, unsigned long channel4Pulse,
 
 // Berechnet den PWM-Wert für den Heckrotor und berücksichtigt manuelle Eingaben (Channel 4)
 unsigned long TailRotor::computeTailMotorPulse(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawCorrection) {
-    unsigned long adjustedTailMotorPulse = channel8Pulse * scaleFactor + yawCorrection;
+    unsigned long adjustedTailMotorPulse = channel8Pulse * scaleFactor - yawCorrection;
 
     // Berechne die Anpassung für den Heckrotor basierend auf Channel 4 (manuelle Steuerung)
     int adjustment = map(channel4Pulse, 1000, 2000, -200, 200);  // Mappe den Bereich von 1000-2000 auf -200 bis +200

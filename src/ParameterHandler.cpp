@@ -16,7 +16,7 @@ PID pidYaw(90.0, 0.0, 5.0, integralLimit, yawPIDFactor);
 
 float rollPIDFactor = 1;
 float pitchPIDFactor = 1;
-float yawPIDFactor = 1.5;
+float yawPIDFactor = 2;
 float integralLimit = 100.0;
 
 // Motor-Pins
@@ -53,7 +53,7 @@ bool useLowPass = true;
 bool useHighPass = false;
 bool useMovingAvg = false;
 bool useKalman = false;
-bool useRPMFilter = true; 
+bool useRPMFilter = false; 
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;
