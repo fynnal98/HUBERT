@@ -13,12 +13,17 @@
 #include "DataLogger.h"
 #include "ParameterHandler.h"
 #include "SerialHandler.h"
+#include "LEDControl.h" 
 
 // MPU
 MPU6050 mpu;
 
 // Logger erstellen
 DataLogger logger;
+
+// LED-Steuerung
+extern int ledPin;
+LEDControl ledControl(ledPin);
 
 // FilterHandler für Roll und Pitch erstellen
 FilterHandler rollFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, pidRoll);
@@ -29,8 +34,8 @@ FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, 
 
 // Motoren
 MainMotor mainMotorServo(mainMotorPin);
-TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw); 
-SBUSReceiver sbusReceiver(Serial2); 
+TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw);
+SBUSReceiver sbusReceiver(Serial2);
 
 void setup() {
     Serial.begin(115200);
@@ -40,7 +45,7 @@ void setup() {
 
     initWatchdog(2);
     sbusReceiver.begin();
-    Wire.begin(wireSDA, wireSCL);  
+    Wire.begin(wireSDA, wireSCL);
     mpu.begin();
 
     Serial.println("Starte Gyroskop-Kalibrierung...");
@@ -54,7 +59,7 @@ void setup() {
 }
 
 void loop() {
-    unsigned int channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel10Pulse;
+    unsigned int channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse;
 
     processSerialData();
     resetWatchdog();
@@ -68,10 +73,10 @@ void loop() {
         return;
     }
 
-    if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel10Pulse)) {
+    if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse)) {
         // Deklariere die Event-Variablen
         sensors_event_t a, g, temp;
-        
+
         // Rufe die Daten des MPU ab
         mpu.getEvent(&a, &g, &temp);
 
@@ -79,7 +84,14 @@ void loop() {
         if (Util::correctionEnabled(channel10Pulse) && mpu.isConnected()) {
             // Aktiviert die Korrektur für Swashplate und Heckrotor
             fbl.update(mpu, channel1Pulse, channel2Pulse, channel6Pulse, useLowPass, useHighPass, useMovingAvg, useKalman);
-            tailRotor.setCorrectionEnabled(true);
+            ledControl.steadyOn();
+
+            if (channel9Pulse > 1500) {
+                tailRotor.setCorrectionEnabled(true);
+            } else {
+                tailRotor.setCorrectionEnabled(false);
+            }
+
             tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
         } else {
             // Deaktiviert die Korrektur und steuert die Servos direkt
@@ -90,6 +102,7 @@ void loop() {
             // TailRotor ohne Korrektur ansteuern
             tailRotor.setCorrectionEnabled(false);
             tailRotor.update(channel8Pulse, channel4Pulse, 0);
+            ledControl.steadyOff();
         }
 
         // Setze den MainMotor-Puls
