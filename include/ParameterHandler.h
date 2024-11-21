@@ -1,7 +1,11 @@
 #ifndef PARAMETERHANDLER_H
 #define PARAMETERHANDLER_H
 
+#include <string>
+
 #include "PID.h"
+
+bool initializeParametersFromJSON(const char* filePath);
 
 // Definition der Servo-Pins
 extern int pinServo1;
@@ -47,7 +51,6 @@ extern bool useLowPass;
 extern bool useHighPass;
 extern bool useMovingAvg;
 extern bool useKalman;
-extern bool useRPMFilter;  // Flag für RPM-Filter
 
 // CG-Offsets für den MPU
 extern float cgOffsetX;
@@ -65,15 +68,10 @@ extern const int calibrationDuration;
 // Kalibrierungsstatus
 extern bool calibrationCompleted;
 
-// RPM-Filterparameter
-extern int rpm;
-extern float bandwidth;
 
 // LED-Pin für Statusanzeigen (wie z. B. Kalibrierung abgeschlossen)
 extern int ledPin;  // LED-Pin über ParameterHandler verwaltet
 
 void initializeParameters();
-void setRPM(int newRPM);
-int getRPM();
 
 #endif // PARAMETERHANDLER_H

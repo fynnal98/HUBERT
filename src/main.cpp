@@ -14,6 +14,7 @@
 #include "ParameterHandler.h"
 #include "SerialHandler.h"
 #include "LEDControl.h" 
+#include <SPIFFS.h>
 
 // MPU
 MPU6050 mpu;
@@ -37,18 +38,35 @@ MainMotor mainMotorServo(mainMotorPin);
 TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw);
 SBUSReceiver sbusReceiver(Serial2);
 
+void listSPIFFSFiles() {
+    Serial.println("SPIFFS-Dateisystem:");
+    File root = SPIFFS.open("/");
+    File file = root.openNextFile();
+    while (file) {
+        Serial.print("Datei: ");
+        Serial.println(file.name());
+        file = root.openNextFile();
+    }
+}
+
 void setup() {
     Serial.begin(115200);
 
-    // Initialisiere Parameter
-    initializeParameters();
+    SPIFFS.begin();
+    listSPIFFSFiles();
+
+    const char* filePath = "/SystemDatabase/database.json";
+    
+    initializeParametersFromJSON(filePath);
 
     initWatchdog(2);
+
     sbusReceiver.begin();
+
     Wire.begin(wireSDA, wireSCL);
+
     mpu.begin();
 
-    Serial.println("Starte Gyroskop-Kalibrierung...");
     MPU6050Calibration::beginCalibration(calibrationDuration);
 
     fbl.setup();

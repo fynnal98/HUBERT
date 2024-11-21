@@ -25,8 +25,8 @@ void FBL::update(MPU6050& mpu, unsigned long channel1Pulse, unsigned long channe
     mpu.calculateCorrectedAccelerations(&a, &g, ax_corrected, ay_corrected);
 
     // Apply filters but swap x (roll) and y (pitch) in the correction logic with negation for 180-degree rotation
-    float pitchCorrection = rollFilterHandler.apply(-ax_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger); // Verwende useRPMFilter aus ParameterHandler
-    float rollCorrection = pitchFilterHandler.apply(-ay_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger);  // Verwende useRPMFilter aus ParameterHandler
+    float pitchCorrection = rollFilterHandler.apply(-ax_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, logger); // Verwende useRPMFilter aus ParameterHandler
+    float rollCorrection = pitchFilterHandler.apply(-ay_corrected, useLowPass, useHighPass, useMovingAvg, useKalman, logger);  // Verwende useRPMFilter aus ParameterHandler
 
     // float pitchCorrection = rollFilterHandler.apply(g.gyro.x, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger); // Verwende useRPMFilter aus ParameterHandler
     // float rollCorrection = pitchFilterHandler.apply(g.gyro.y, useLowPass, useHighPass, useMovingAvg, useKalman, useRPMFilter, logger);  // Verwende useRPMFilter aus ParameterHandler

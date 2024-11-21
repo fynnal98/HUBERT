@@ -6,9 +6,9 @@ DataLogger::DataLogger() {
 
 // Ausgabe sowohl der ungefilterten als auch der gefilterten Gyroskop-Daten (gx, gy, rollFiltered, pitchFiltered)
 void DataLogger::logData(float gx, float gy, float rollFiltered, float pitchFiltered) {
-    Serial.print("Raw: ");
-    Serial.print(gx); Serial.print(",");
-    Serial.print(gy);
+    // Serial.print("Raw: ");
+    // Serial.print(gx); Serial.print(",");
+    // Serial.print(gy);
 
     // Wenn keine gefilterten Werte vorhanden sind, ersetze sie durch die Rohwerte der Gyrodaten
     if (rollFiltered == -1 && pitchFiltered == -1) {
@@ -16,7 +16,7 @@ void DataLogger::logData(float gx, float gy, float rollFiltered, float pitchFilt
         pitchFiltered = gy;
     }
 
-    Serial.print(" | Filtered: ");
-    Serial.print(rollFiltered); Serial.print(",");
-    Serial.println(pitchFiltered);  // Gefilterte Roll- und Pitch-Werte
+    // Serial.print(" | Filtered: ");
+    // Serial.print(rollFiltered); Serial.print(",");
+    // Serial.println(pitchFiltered);  
 }

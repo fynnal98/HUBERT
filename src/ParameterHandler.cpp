@@ -1,12 +1,15 @@
 #include "ParameterHandler.h"
 
+#include <ArduinoJson.h>
+#include <SPIFFS.h>
+
+
 // Definition der Servo-Pins
 int pinServo1 = 13;
 int pinServo2 = 14;
 int pinServo3 = 15;
 
-// In ParameterHandler.cpp
-int ledPin = 2;  // Standardwert für den LED-Pin
+int ledPin = 2;  
 
 
 // PID-Controller
@@ -44,16 +47,11 @@ float kalmanR = 0.2;
 float kalmanEstimateError = 1.0;
 float kalmanInitialEstimate = 0.0;
 
-// RPM für den RPM-Filter
-int rpm = 20000;
-float bandwidth = 10.0;
-
 // Flags, um Filter zu aktivieren oder deaktivieren
 bool useLowPass = true;
 bool useHighPass = false;
 bool useMovingAvg = false;
 bool useKalman = false;
-bool useRPMFilter = false; 
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;
@@ -72,14 +70,34 @@ const int calibrationDuration = 1000;
 bool calibrationCompleted = false;  
 
 
+bool initializeParametersFromJSON(const char* filePath) {
+    File file = SPIFFS.open(filePath, "r");
+    if (!file) {
+        Serial.printf("Fehler beim Öffnen der JSON-Datei: %s\n", filePath);
+        return false;
+    }
 
-void initializeParameters() {
-}
+    String fileContent = file.readString();
+    file.close();
 
-void setRPM(int newRPM) {
-    rpm = newRPM;
-}
+    StaticJsonDocument<4096> doc;
 
-int getRPM() {
-    return rpm;
+    // Versuche die JSON-Daten zu deserialisieren
+    DeserializationError error = deserializeJson(doc, fileContent);
+    if (error) {
+        Serial.printf("Fehler beim Parsen der JSON-Datei: %s\n", error.c_str());
+        return false;
+    }
+
+    if (doc["pins"]["servo"]["pinServo1"].is<int>()) {
+        int pinServo1 = doc["pins"]["servo"]["pinServo1"];
+    }
+    if (doc["pins"]["servo"]["pinServo2"].is<int>()) {
+        int pinServo2 = doc["pins"]["servo"]["pinServo2"];
+    }
+    if (doc["pins"]["servo"]["pinServo3"].is<int>()) {
+        int pinServo3 = doc["pins"]["servo"]["pinServo3"];
+    }
+
+    return true;
 }
