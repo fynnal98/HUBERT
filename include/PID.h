@@ -6,12 +6,14 @@ public:
     PID(float kp, float ki, float kd, float integralLimit, float factor);
     float compute(float setpoint, float measured);
 
-private:
+    // PID-Parameter öffentlich machen
     float kp, ki, kd;
+
+private:
     float prevError;
     float integral;
     float integralLimit;
-    float factor;  // Der neue Faktor
+    float factor;
 };
 
 #endif // PID_H

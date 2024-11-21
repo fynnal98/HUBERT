@@ -45,7 +45,7 @@
     }
   },
   "filter": {
-    "parameters": {
+    "filterValues": {
       "lowPassCutoffFrequency": 60.0,
       "highPassCutoffFrequency": 100.0,
       "movingAvgWindowSize": 5,
@@ -58,8 +58,7 @@
       "useLowPass": true,
       "useHighPass": false,
       "useMovingAvg": false,
-      "useKalman": false,
-      "useRPMFilter": false
+      "useKalman": false
     },
     "rpm": {
       "rpm": 20000,

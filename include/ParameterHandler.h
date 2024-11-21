@@ -23,16 +23,16 @@ extern float yawPIDFactor;
 extern float integralLimit;
 
 // Motor-Pins
-extern const int mainMotorPin;
-extern const int tailMotorPin;
-extern const int tailRotorFactor;
+extern int mainMotorPin;
+extern int tailMotorPin;
+extern int tailRotorFactor;
 
 // SBUS
-extern const int sbusPin;
+extern int sbusPin;
 
 // Wire-Pins (SDA, SCL)
-extern const int wireSDA;
-extern const int wireSCL;
+extern int wireSDA;
+extern int wireSCL;
 
 extern float sampleRate; 
 
@@ -63,7 +63,7 @@ extern float gyroDriftOffsetY;
 extern float gyroDriftOffsetZ;
 
 // Kalibrierungsparameter
-extern const int calibrationDuration;
+extern int calibrationDuration;
 
 // Kalibrierungsstatus
 extern bool calibrationCompleted;

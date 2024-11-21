@@ -39,15 +39,15 @@ TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw);
 SBUSReceiver sbusReceiver(Serial2);
 
 void listSPIFFSFiles() {
-    Serial.println("SPIFFS-Dateisystem:");
+    Serial.println("Liste der Dateien im SPIFFS:");
     File root = SPIFFS.open("/");
     File file = root.openNextFile();
     while (file) {
-        Serial.print("Datei: ");
-        Serial.println(file.name());
+        Serial.printf("Datei: %s\n", file.name());
         file = root.openNextFile();
     }
 }
+
 
 void setup() {
     Serial.begin(115200);
