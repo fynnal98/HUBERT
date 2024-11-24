@@ -25,7 +25,9 @@ extern float integralLimit;
 // Motor-Pins
 extern int mainMotorPin;
 extern int tailMotorPin;
-extern int tailRotorFactor;
+
+extern float scaleFactor;
+extern float pitchFactor;
 
 // SBUS
 extern int sbusPin;

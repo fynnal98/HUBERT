@@ -35,7 +35,9 @@ FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, 
 
 // Motoren
 MainMotor mainMotorServo(mainMotorPin);
-TailRotor tailRotor(tailMotorPin, tailRotorFactor, pidYaw);
+TailRotor tailRotor(tailMotorPin, scaleFactor, pitchFactor, pidYaw);
+
+
 SBUSReceiver sbusReceiver(Serial2);
 
 void listSPIFFSFiles() {
@@ -47,7 +49,6 @@ void listSPIFFSFiles() {
         file = root.openNextFile();
     }
 }
-
 
 void setup() {
     Serial.begin(115200);
@@ -77,7 +78,7 @@ void setup() {
 }
 
 void loop() {
-    unsigned int channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse;
+    unsigned int channel1Pulse, channel2Pulse, channel3Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse;
 
     processSerialData();
     resetWatchdog();
@@ -91,37 +92,35 @@ void loop() {
         return;
     }
 
-    if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse)) {
+    if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel3Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse)) {
         // Deklariere die Event-Variablen
         sensors_event_t a, g, temp;
 
         // Rufe die Daten des MPU ab
         mpu.getEvent(&a, &g, &temp);
 
-        // Prüfe, ob Channel 10 aktiviert ist und der MPU verbunden ist
+        // Prüfe, ob die Korrektur für die FBL aktiviert ist
         if (Util::correctionEnabled(channel10Pulse) && mpu.isConnected()) {
-            // Aktiviert die Korrektur für Swashplate und Heckrotor
+            // Aktiviert die Korrektur für die Swashplate
             fbl.update(mpu, channel1Pulse, channel2Pulse, channel6Pulse, useLowPass, useHighPass, useMovingAvg, useKalman);
             ledControl.steadyOn();
-
-            if (channel9Pulse > 1500) {
-                tailRotor.setCorrectionEnabled(true);
-            } else {
-                tailRotor.setCorrectionEnabled(false);
-            }
-
-            tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
         } else {
             // Deaktiviert die Korrektur und steuert die Servos direkt
             fbl.servo1.writeMicroseconds(channel2Pulse);
             fbl.servo2.writeMicroseconds(channel6Pulse);
             fbl.servo3.writeMicroseconds(channel1Pulse);
-
-            // TailRotor ohne Korrektur ansteuern
-            tailRotor.setCorrectionEnabled(false);
-            tailRotor.update(channel8Pulse, channel4Pulse, 0);
             ledControl.steadyOff();
         }
+
+        // Prüfe, ob die Korrektur für den Heckrotor aktiviert ist
+        if (channel9Pulse > 1500 && mpu.isConnected()) {
+            tailRotor.setCorrectionEnabled(true);
+        } else {
+            tailRotor.setCorrectionEnabled(false);
+        }
+
+        // Update des Heckrotors (mit oder ohne Korrektur)
+        tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
 
         // Setze den MainMotor-Puls
         mainMotorServo.setPulse(channel8Pulse);

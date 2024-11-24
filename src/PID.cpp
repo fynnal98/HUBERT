@@ -21,3 +21,8 @@ float PID::compute(float setpoint, float measured) {
     // PID-Ausgabe und Faktor anwenden
     return (kp * error + ki * integral + kd * derivative) * factor;
 }
+
+void PID::setSetpoint(float setpoint) {
+    prevError = setpoint; // Setze den letzten Fehler auf den neuen Sollwert
+    integral = 0; // Setze das Integral zurück, um eine frische Berechnung zu starten
+}

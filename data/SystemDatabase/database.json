@@ -7,8 +7,7 @@
     },
     "motor": {
       "mainMotorPin": 5,
-      "tailMotorPin": 17,
-      "tailRotorFactor": 1
+      "tailMotorPin": 17
     },
     "sbus": {
       "sbusPin": 16
@@ -44,6 +43,15 @@
       "integral_limit": 100.0
     }
   },
+
+  
+  "tail": {
+    "scaleFactor": 1.0,
+    "pitchFactor": 1
+  },
+  
+  
+  
   "filter": {
     "filterValues": {
       "lowPassCutoffFrequency": 60.0,

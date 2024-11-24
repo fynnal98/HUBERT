@@ -1,45 +1,49 @@
 #include "TailRotor.h"
 
-// Konstruktor: Übergibt Pin, Skalierungsfaktor und den bereits erstellten PID-Regler
-TailRotor::TailRotor(int motorPin, float scaleFactor, PID& pidYaw)
-    : motorPin(motorPin), scaleFactor(scaleFactor), pidYaw(pidYaw), correctionEnabled(true) {}  // Standardmäßig Korrektur aktiviert
+TailRotor::TailRotor(int motorPin, float scaleFactor, float pitchFactor, PID& pidYaw)
+    : motorPin(motorPin), scaleFactor(scaleFactor), pitchFactor(pitchFactor), pidYaw(pidYaw), correctionEnabled(true), lastYawSetpoint(0) {}
 
-// Setup-Funktion: Initialisiert den Servo und verbindet ihn mit dem Pin
 void TailRotor::setup() {
-    motorServo.attach(motorPin);  // Servo an den angegebenen Pin anhängen
+    motorServo.attach(motorPin);
 }
 
-// Funktion, um die Korrektur zu aktivieren oder zu deaktivieren
 void TailRotor::setCorrectionEnabled(bool enabled) {
     correctionEnabled = enabled;
 }
 
-// Update-Funktion: Wendet die Korrektur an, falls aktiviert
 void TailRotor::update(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawRate) {
     float yawCorrection = 0;
-    
-    if (correctionEnabled) {
-        // Berechnung der Yaw-Korrektur basierend auf Gyroskop-Daten
-        yawCorrection = pidYaw.compute(0, yawRate);  // Verwende 0 als Sollwert (kein Yaw), yawRate als Istwert
+
+    // Erkenne manuelle Eingriffe am Yaw-Kanal
+    bool manualYawControl = abs((int)channel4Pulse - 1500) > 50; // Toleranzbereich von ±50 um den Mittelwert 1500
+
+    if (manualYawControl) {
+        // Wenn manuell gesteuert wird, PID-Korrektur aussetzen und aktuellen Yaw-Wert als Sollwert setzen
+        lastYawSetpoint = yawRate;  // Der aktuelle Yaw-Wert wird als neuer Sollwert gesetzt
     }
 
-    // Berechnung des PWM-Werts für den Heckrotor basierend auf Kanalwerten und Yaw-Korrektur
+    // Korrektur nur berechnen, wenn sie aktiviert ist
+    if (correctionEnabled) {
+        pidYaw.setSetpoint(lastYawSetpoint); // Setze den letzten Yaw-Wert als Sollwert für den PID-Regler
+        yawCorrection = pidYaw.compute(lastYawSetpoint, yawRate);
+    }
+
     unsigned long adjustedTailMotorPulse = computeTailMotorPulse(channel8Pulse, channel4Pulse, yawCorrection);
 
-    // Ausgabe des skalierten und angepassten PWM-Werts auf den Heckmotor
     motorServo.writeMicroseconds(adjustedTailMotorPulse);
 }
 
-// Berechnet den PWM-Wert für den Heckrotor und berücksichtigt manuelle Eingaben (Channel 4)
+
 unsigned long TailRotor::computeTailMotorPulse(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawCorrection) {
-    unsigned long adjustedTailMotorPulse = channel8Pulse * scaleFactor - yawCorrection;
+    // Grundpuls basierend auf channel8Pulse, skaliert mit scaleFactor
+    float basePulse = channel8Pulse * scaleFactor;
 
-    // Berechne die Anpassung für den Heckrotor basierend auf Channel 4 (manuelle Steuerung)
-    int adjustment = map(channel4Pulse, 1000, 2000, -200, 200);  // Mappe den Bereich von 1000-2000 auf -200 bis +200
+    // Manuelle Anpassung basierend auf channel4Pulse
+    int manualAdjustment = map(channel4Pulse, 1000, 2000, -200, 200);
 
-    // Hinzufügen der Anpassung zum PWM-Wert
-    adjustedTailMotorPulse += adjustment;
+    // Gesamtberechnung des Pulses unter Berücksichtigung aller Faktoren
+    unsigned long totalPulse = basePulse - yawCorrection + manualAdjustment;
 
-    // Sicherstellen, dass der Wert im gültigen PWM-Bereich bleibt (1000 bis 2000 us)
-    return constrain(adjustedTailMotorPulse, 1000, 2000);
+    // Begrenzung des Pulses auf den Bereich von 1000 bis 2000 Mikrosekunden
+    return constrain(totalPulse, 1000, 2000);
 }

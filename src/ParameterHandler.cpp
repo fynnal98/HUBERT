@@ -11,7 +11,6 @@ int pinServo3 = 15;
 
 int ledPin = 2;  
 
-
 // PID-Controller
 PID pidRoll(90.0, 0.0, 10, integralLimit, rollPIDFactor);
 PID pidPitch(90.0, 0.0, 10, integralLimit, pitchPIDFactor);
@@ -25,7 +24,9 @@ float integralLimit = 100.0;
 // Motor-Pins
 int mainMotorPin = 5;
 int tailMotorPin = 17;
-int tailRotorFactor = 1;
+
+float scaleFactor = 1   	;
+float pitchFactor = 0.2;
 
 // SBUS-Pin
 int sbusPin = 16;
@@ -102,7 +103,9 @@ bool initializeParametersFromJSON(const char* filePath) {
 
     loadParameter(doc["pins"]["motor"], mainMotorPin, "mainMotorPin");
     loadParameter(doc["pins"]["motor"], tailMotorPin, "tailMotorPin");
-    loadParameter(doc["pins"]["motor"], tailRotorFactor, "tailRotorFactor");
+
+    loadParameter(doc["tail"], scaleFactor, "scaleFactor");
+    loadParameter(doc["tail"], pitchFactor, "pitchFactor");
 
     loadParameter(doc["pins"]["sbus"], sbusPin, "sbusPin");
     loadParameter(doc["pins"]["wire"], wireSDA, "wireSDA");
