@@ -35,7 +35,7 @@ FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, 
 
 // Motoren
 MainMotor mainMotorServo(mainMotorPin);
-TailRotor tailRotor(tailMotorPin, scaleFactor, pitchFactor, pidYaw);
+TailRotor tailRotor(tailMotorPin, scaleFactor, pidYaw);
 
 
 SBUSReceiver sbusReceiver(Serial2);

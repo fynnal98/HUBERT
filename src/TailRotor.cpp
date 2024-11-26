@@ -1,7 +1,7 @@
 #include "TailRotor.h"
 
-TailRotor::TailRotor(int motorPin, float scaleFactor, float pitchFactor, PID& pidYaw)
-    : motorPin(motorPin), scaleFactor(scaleFactor), pitchFactor(pitchFactor), pidYaw(pidYaw), correctionEnabled(true), lastYawSetpoint(0) {}
+TailRotor::TailRotor(int motorPin, float scaleFactor, PID& pidYaw)
+    : motorPin(motorPin), scaleFactor(scaleFactor),  pidYaw(pidYaw), correctionEnabled(true), lastYawSetpoint(0) {}
 
 void TailRotor::setup() {
     motorServo.attach(motorPin);
@@ -35,15 +35,22 @@ void TailRotor::update(unsigned long channel8Pulse, unsigned long channel4Pulse,
 
 
 unsigned long TailRotor::computeTailMotorPulse(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawCorrection) {
-    // Grundpuls basierend auf channel8Pulse, skaliert mit scaleFactor
-    float basePulse = channel8Pulse * scaleFactor;
+    // Skaliere den Eingabewert von channel8Pulse, um größere scaleFactor-Werte zu ermöglichen
+    float normalizedChannel8Pulse = map(channel8Pulse, 1000, 2000, 500, 1500);  // Skaliere auf einen kleineren Bereich
 
-    // Manuelle Anpassung basierend auf channel4Pulse
-    int manualAdjustment = map(channel4Pulse, 1000, 2000, -200, 200);
+    // Berechne den Basiswert für den Heckrotor
+    unsigned long basePulse = normalizedChannel8Pulse * scaleFactor;
 
-    // Gesamtberechnung des Pulses unter Berücksichtigung aller Faktoren
+    // Berechne die manuelle Anpassung basierend auf channel4Pulse
+    int manualAdjustment = map(channel4Pulse, 1000, 2000, -100, 100);
+
+    // Füge die Yaw-Korrektur und die manuelle Anpassung hinzu
     unsigned long totalPulse = basePulse - yawCorrection + manualAdjustment;
 
-    // Begrenzung des Pulses auf den Bereich von 1000 bis 2000 Mikrosekunden
+    // Debug-Ausgaben für bessere Kontrolle
+    Serial.printf("channel8Pulse: %lu, normalizedChannel8Pulse: %.2f, scaleFactor: %.2f, yawCorrection: %.2f, adjustment: %d, totalPulse: %lu\n",
+                  channel8Pulse, normalizedChannel8Pulse, scaleFactor, yawCorrection, manualAdjustment, totalPulse);
+
+    // Begrenze den Wert auf den gültigen Bereich (1000-2000 Mikrosekunden)
     return constrain(totalPulse, 1000, 2000);
 }

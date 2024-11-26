@@ -25,7 +25,7 @@ float integralLimit = 100.0;
 int mainMotorPin = 5;
 int tailMotorPin = 17;
 
-float scaleFactor = 1   	;
+float scaleFactor = 1.85;
 float pitchFactor = 0.2;
 
 // SBUS-Pin

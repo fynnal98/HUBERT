@@ -8,7 +8,7 @@
 
 class TailRotor {
 public:
-    TailRotor(int motorPin, float scaleFactor, float pitchFactor, PID& pidYaw); // pitchFactor hier behalten
+    TailRotor(int motorPin, float scaleFactor, PID& pidYaw); // pitchFactor hier behalten
     void setup();
     void update(unsigned long channel8Pulse, unsigned long channel4Pulse, float yawRate); // Entfernt channel3Pulse
     void setCorrectionEnabled(bool enabled);
@@ -18,7 +18,6 @@ private:
 
     // Tail-spezifische Faktoren
     float scaleFactor;
-    float pitchFactor; // Beibehalten für mögliche spätere Nutzung
     float lastYawSetpoint;
 
     Servo motorServo;
