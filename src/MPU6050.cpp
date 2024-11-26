@@ -1,32 +1,55 @@
+#include <Wire.h>
 #include "MPU6050.h"
 #include "DataLogger.h"
 #include "ParameterHandler.h"  // Um auf den LED-Pin zuzugreifen
 
 #define MPU6050_ADDRESS 0x68  
-#define MPU6050_SMPLRT_DIV 0x19  
+#define MPU6050_SMPLRT_DIV 0x19
 
 extern int ledPin;
 
 MPU6050::MPU6050() : mpu(), cgOffsetX(0.0), cgOffsetY(0.0), cgOffsetZ(0.0), mpuConnected(true) {}
 
 void MPU6050::begin() {
+    Wire.begin();
+
+    // Versuche, den Sensor zu starten
     if (!mpu.begin()) {
         Serial.println("Failed to find MPU6050 chip");
         mpuConnected = false;  // Setze mpuConnected auf false, wenn die Initialisierung fehlschlägt
     } else {
-        mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
-        mpu.setGyroRange(MPU6050_RANGE_1000_DEG);
-        mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
-        
-        Wire.beginTransmission(MPU6050_ADDRESS);
-        Wire.write(MPU6050_SMPLRT_DIV);
-        Wire.write(0x00); // das heißt 1000hz
-        Wire.endTransmission();
-
+        configureMPU6050();
         mpuConnected = true;
     }
 
     pinMode(ledPin, OUTPUT);  // Initialisiere den LED-Pin
+}
+
+void MPU6050::configureMPU6050() {
+    Wire.beginTransmission(MPU6050_ADDRESS);
+
+    // DLPF auf 5 Hz setzen
+    Wire.write(0x1A); // CONFIG-Register
+    Wire.write(0x06); // DLPF auf 5 Hz
+    Wire.endTransmission();
+
+    // Abtastrate auf 200 Hz reduzieren
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(MPU6050_SMPLRT_DIV); // SMPLRT_DIV-Register
+    Wire.write(0x04); // Sample Rate Divider (200 Hz)
+    Wire.endTransmission();
+
+    // Gyro-Empfindlichkeit auf ±2000°/s setzen
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(0x1B); // GYRO_CONFIG-Register
+    Wire.write(0x18); // ±2000°/s
+    Wire.endTransmission();
+
+    // Accelerometer-Empfindlichkeit auf ±16g setzen
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(0x1C); // ACCEL_CONFIG-Register
+    Wire.write(0x18); // ±16g
+    Wire.endTransmission();
 }
 
 void MPU6050::checkConnectionAndBlink() {
@@ -41,6 +64,7 @@ void MPU6050::checkConnectionAndBlink() {
             // Versuche, die Verbindung wiederherzustellen
             mpuConnected = mpu.begin();
             if (mpuConnected) {
+                configureMPU6050();
                 Serial.println("Verbindung zum MPU6050 wiederhergestellt.");
             }
         }

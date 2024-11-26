@@ -17,7 +17,10 @@ public:
 
     // Methode zur Überprüfung des Verbindungsstatus und zum Blinken der LED bei Abbruch
     void checkConnectionAndBlink();
-    
+
+    // Konfiguration des Sensors zur Reduktion von Störungen
+    void configureMPU6050();
+
     bool isConnected() const;
 
 private:
