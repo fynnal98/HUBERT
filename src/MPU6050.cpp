@@ -24,33 +24,38 @@ void MPU6050::begin() {
 }
 
 void MPU6050::configureMPU6050() {
-    // Konfigurationscode bleibt unverändert
     Wire.beginTransmission(MPU6050_ADDRESS);
-    Wire.write(0x1A); // CONFIG-Register
-    Wire.write(0x06); // DLPF auf 5 Hz
+
+    // CONFIG (Digital Low Pass Filter auf 20 Hz)
+    Wire.write(0x1A); 
+    Wire.write(0x04); 
     Wire.endTransmission();
 
+    // SMPLRT_DIV (500 Hz Abtastrate)
     Wire.beginTransmission(MPU6050_ADDRESS);
-    Wire.write(MPU6050_SMPLRT_DIV); // SMPLRT_DIV-Register
-    Wire.write(0x04); // Sample Rate Divider (200 Hz)
+    Wire.write(MPU6050_SMPLRT_DIV); 
+    Wire.write(0x01); 
     Wire.endTransmission();
 
+    // GYRO_CONFIG (±500°/s)
     Wire.beginTransmission(MPU6050_ADDRESS);
-    Wire.write(0x1B); // GYRO_CONFIG-Register
-    Wire.write(0x18); // ±2000°/s
+    Wire.write(0x1B); 
+    Wire.write(0x08); 
     Wire.endTransmission();
 
+    // ACCEL_CONFIG (±4g)
     Wire.beginTransmission(MPU6050_ADDRESS);
-    Wire.write(0x1C); // ACCEL_CONFIG-Register
-    Wire.write(0x18); // ±16g
+    Wire.write(0x1C); 
+    Wire.write(0x08); 
     Wire.endTransmission();
 }
+
 
 void MPU6050::checkConnectionAndBlink() {
     if (!mpuConnected) {
         Serial.println("Verbindung zum MPU6050 verloren. Versuche erneut...");
         while (!mpuConnected) {
-            delay(500);
+            delay(20);
             mpuConnected = mpu.begin();
             if (mpuConnected) {
                 configureMPU6050();

@@ -1,8 +1,8 @@
 {
   "pins": {
     "servo": {
-      "pinServo1": 14,
-      "pinServo2": 13,
+      "pinServo1": 13,
+      "pinServo2": 14,
       "pinServo3": 15
     },
     "motor": {
@@ -25,14 +25,14 @@
       "kp": 90.0,
       "ki": 0.0,
       "kd": 10.0,
-      "factor": 1.0,
+      "factor": 100.0,
       "integral_limit": 100.0
     },
     "pitch": {
       "kp": 90.0,
       "ki": 0.0,
       "kd": 10.0,
-      "factor": 1.0,
+      "factor": 100.0,
       "integral_limit": 100.0
     },
     "yaw": {

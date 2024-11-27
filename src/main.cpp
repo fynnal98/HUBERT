@@ -26,12 +26,16 @@ DataLogger logger;
 extern int ledPin;
 LEDControl ledControl(ledPin);
 
-// FilterHandler für Roll und Pitch erstellen
 FilterHandler rollFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, 
-                                 kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, sampleRate);
+                                 kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, 
+                                 pidRoll, pidPitch, sampleRate);
 
 FilterHandler pitchFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, 
-                                  kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, sampleRate);
+                                  kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, 
+                                  pidRoll, pidPitch, sampleRate);
+
+
+
 
 // FBL-Objekt
 FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, logger);

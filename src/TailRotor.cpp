@@ -47,9 +47,6 @@ unsigned long TailRotor::computeTailMotorPulse(unsigned long channel8Pulse, unsi
     // Füge die Yaw-Korrektur und die manuelle Anpassung hinzu
     unsigned long totalPulse = basePulse - yawCorrection + manualAdjustment;
 
-    // Debug-Ausgaben für bessere Kontrolle
-    Serial.printf("channel8Pulse: %lu, normalizedChannel8Pulse: %.2f, scaleFactor: %.2f, yawCorrection: %.2f, adjustment: %d, totalPulse: %lu\n",
-                  channel8Pulse, normalizedChannel8Pulse, scaleFactor, yawCorrection, manualAdjustment, totalPulse);
 
     // Begrenze den Wert auf den gültigen Bereich (1000-2000 Mikrosekunden)
     return constrain(totalPulse, 1000, 2000);

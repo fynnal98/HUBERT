@@ -12,8 +12,8 @@ int pinServo3 = 15;
 int ledPin = 2;  
 
 // PID-Controller
-PID pidRoll(90.0, 0.0, 10, integralLimit, rollPIDFactor);
-PID pidPitch(90.0, 0.0, 10, integralLimit, pitchPIDFactor);
+PID pidRoll(90.0, 0.0, 0, integralLimit, rollPIDFactor);
+PID pidPitch(90.0, 0.0, 0, integralLimit, pitchPIDFactor);
 PID pidYaw(90.0, 0.0, 5.0, integralLimit, yawPIDFactor);
 
 float rollPIDFactor = 1;
@@ -49,10 +49,10 @@ float kalmanEstimateError = 1.0;
 float kalmanInitialEstimate = 0.0;
 
 // Flags, um Filter zu aktivieren oder deaktivieren
-bool useLowPass = true;
+bool useLowPass = false;
 bool useHighPass = false;
 bool useMovingAvg = false;
-bool useKalman = true;
+bool useKalman = true; 
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;
