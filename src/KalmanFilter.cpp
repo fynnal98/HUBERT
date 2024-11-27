@@ -1,19 +1,20 @@
 #include "KalmanFilter.h"
 
 KalmanFilter::KalmanFilter(float processNoise, float measurementNoise, float estimateError, float initialEstimate)
-    : processNoise(processNoise), measurementNoise(measurementNoise), estimateError(estimateError), lastEstimate(initialEstimate) {}
+    : processNoise(processNoise), measurementNoise(measurementNoise), 
+      estimateError(estimateError), lastEstimate(initialEstimate) {}
 
-float KalmanFilter::updateEstimate(float measurement) {
-    // Predict the estimate error
-    estimateError += processNoise;
+float KalmanFilter::update(float predictedValue, float measuredValue, float dt) {
+    // Erhöhe den Schätzfehler basierend auf dem Prozessrauschen und der Zeit
+    estimateError += processNoise * dt;
 
-    // Kalman gain
+    // Berechne den Kalman-Gewinn
     float kalmanGain = estimateError / (estimateError + measurementNoise);
 
-    // Update estimate with the Kalman gain
-    lastEstimate += kalmanGain * (measurement - lastEstimate);
+    // Aktualisiere die Schätzung basierend auf der Vorhersage (Gyro) und der Messung (Accel)
+    lastEstimate = predictedValue + kalmanGain * (measuredValue - predictedValue);
 
-    // Update error in estimate
+    // Aktualisiere den Schätzfehler
     estimateError *= (1 - kalmanGain);
 
     return lastEstimate;

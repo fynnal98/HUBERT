@@ -1,44 +1,123 @@
 #include "FilterHandler.h"
-#include "ParameterHandler.h"
-#include "DataLogger.h"
+#include <Arduino.h> // Für Serial-Debugging
 
-// Konstruktor: Initialisiert alle Filter und den PID-Regler
-FilterHandler::FilterHandler(float lowPassCutoffFrequency, float highPassCutoffFrequency, int movingAvgWindowSize, float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate, PID& pid)
-    : lowPassFilter(lowPassCutoffFrequency, sampleRate),  // Verwende sampleRate aus dem ParameterHandler
-      highPassFilter(highPassCutoffFrequency, sampleRate), 
-      movingAvgFilter(movingAvgWindowSize), kalmanFilter(kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate), pid(pid) {
+FilterHandler::FilterHandler(float lowPassCutoff, float highPassCutoff, int movingAvgWindowSize,
+                             float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate, float sampleRate)
+    : lowPassFilter(lowPassCutoff, sampleRate),
+      highPassFilter(highPassCutoff, sampleRate),
+      movingAvgFilter(movingAvgWindowSize),
+      kalmanFilter(kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate),
+      cgOffsetX(0), cgOffsetY(0), cgOffsetZ(0),
+      integratedGyroRoll(0), integratedGyroPitch(0) {}
 
+
+void FilterHandler::setCGOffsets(float offsetX, float offsetY, float offsetZ) {
+    cgOffsetX = offsetX;
+    cgOffsetY = offsetY;
+    cgOffsetZ = offsetZ;
+
+    // Debugging-Ausgabe
+    Serial.print("Set CG Offsets - X: ");
+    Serial.print(cgOffsetX);
+    Serial.print(", Y: ");
+    Serial.print(cgOffsetY);
+    Serial.print(", Z: ");
+    Serial.println(cgOffsetZ);
 }
 
+float FilterHandler::processRoll(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg) {
+    // Debugging-Ausgabe der Eingangswerte
+    Serial.println("\n[Processing Roll]");
+    Serial.print("Input Accel: ");
+    Serial.println(accel);
+    Serial.print("Input Gyro: ");
+    Serial.println(gyro);
+    Serial.print("dt: ");
+    Serial.println(dt);
 
-// Filter anwenden und das Ergebnis loggen
-float FilterHandler::apply(float value, bool useLowPass, bool useHighPass, bool useMovingAvg, bool useKalman, DataLogger& logger) {
-    float filteredValue = value;  // Starte mit dem Rohwert
-    float initialValue = value;   // Ungefilterter Wert
+    // Zeitschritt absichern
+    if (dt <= 0 || dt > 1.0) {
+        dt = 0.01; // Standardwert
+        Serial.println("Warning: dt reset to 0.01");
+    }
 
-    // Low-pass Filter anwenden, wenn aktiviert
+    // Korrigiere die Beschleunigungsdaten
+    float correctedAccel = accel - (gyro * cgOffsetZ);
+
+    // Debugging-Ausgabe der korrigierten Beschleunigungsdaten
+    Serial.print("Corrected Accel: ");
+    Serial.println(correctedAccel);
+
+    // Integriere Gyro-Daten
+    integratedGyroRoll += gyro * dt;
+    Serial.print("Integrated Gyro Roll: ");
+    Serial.println(integratedGyroRoll);
+
+    // Führe die Fusion durch
+    float fusedValue = kalmanFilter.update(integratedGyroRoll, correctedAccel, dt);
+
+    // Debugging-Ausgabe des Fusionsergebnisses
+    Serial.print("Fused Roll Value: ");
+    Serial.println(fusedValue);
+
+    // Anwenden der Filter
+    return applyFilters(fusedValue, useLowPass, useHighPass, useMovingAvg);
+}
+
+float FilterHandler::processPitch(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg) {
+    // Debugging-Ausgabe der Eingangswerte
+    Serial.println("\n[Processing Pitch]");
+    Serial.print("Input Accel: ");
+    Serial.println(accel);
+    Serial.print("Input Gyro: ");
+    Serial.println(gyro);
+    Serial.print("dt: ");
+    Serial.println(dt);
+
+    // Zeitschritt absichern
+    if (dt <= 0 || dt > 1.0) {
+        dt = 0.01; // Standardwert
+        Serial.println("Warning: dt reset to 0.01");
+    }
+
+    // Korrigiere die Beschleunigungsdaten
+    float correctedAccel = accel - (gyro * cgOffsetX);
+
+    // Debugging-Ausgabe der korrigierten Beschleunigungsdaten
+    Serial.print("Corrected Accel: ");
+    Serial.println(correctedAccel);
+
+    // Integriere Gyro-Daten
+    integratedGyroPitch += gyro * dt;
+    Serial.print("Integrated Gyro Pitch: ");
+    Serial.println(integratedGyroPitch);
+
+    // Führe die Fusion durch
+    float fusedValue = kalmanFilter.update(integratedGyroPitch, correctedAccel, dt);
+
+    // Debugging-Ausgabe des Fusionsergebnisses
+    Serial.print("Fused Pitch Value: ");
+    Serial.println(fusedValue);
+
+    // Anwenden der Filter
+    return applyFilters(fusedValue, useLowPass, useHighPass, useMovingAvg);
+}
+
+float FilterHandler::applyFilters(float value, bool useLowPass, bool useHighPass, bool useMovingAvg) {
     if (useLowPass) {
-        filteredValue = lowPassFilter.apply(filteredValue);
+        value = lowPassFilter.apply(value);
+        Serial.print("After LowPass Filter: ");
+        Serial.println(value);
     }
-
-    // High-pass Filter anwenden, wenn aktiviert
     if (useHighPass) {
-        filteredValue = highPassFilter.apply(filteredValue);
+        value = highPassFilter.apply(value);
+        Serial.print("After HighPass Filter: ");
+        Serial.println(value);
     }
-
-    // Moving Average Filter anwenden, wenn aktiviert
     if (useMovingAvg) {
-        filteredValue = movingAvgFilter.apply(filteredValue);
+        value = movingAvgFilter.apply(value);
+        Serial.print("After MovingAvg Filter: ");
+        Serial.println(value);
     }
-
-    // Kalman Filter anwenden, wenn aktiviert
-    if (useKalman) {
-        filteredValue = kalmanFilter.updateEstimate(filteredValue);
-    }
-
-    // Logge jetzt sowohl Rohdaten als auch gefilterte Daten synchron nach allen Berechnungen
-    logger.logData(initialValue, initialValue, filteredValue, filteredValue);
-
-    // PID-Korrektur anwenden und das finale Ergebnis zurückgeben
-    return pid.compute(0, filteredValue);
+    return value;
 }

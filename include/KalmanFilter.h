@@ -4,13 +4,15 @@
 class KalmanFilter {
 public:
     KalmanFilter(float processNoise, float measurementNoise, float estimateError, float initialEstimate);
-    float updateEstimate(float measurement);
+
+    // Aktualisiere die Schätzung basierend auf Vorhersage (Gyro) und Messung (Accelerometer)
+    float update(float predictedValue, float measuredValue, float dt);
 
 private:
-    float processNoise;      // Process noise covariance (Q)
-    float measurementNoise;  // Measurement noise covariance (R)
-    float estimateError;     // Error in the estimate (P)
-    float lastEstimate;      // Previous estimate
+    float processNoise;      // Prozessrauschen (Q)
+    float measurementNoise;  // Messrauschen (R)
+    float estimateError;     // Fehler in der Schätzung (P)
+    float lastEstimate;      // Letzte Schätzung
 };
 
 #endif // KALMANFILTER_H

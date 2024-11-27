@@ -13,7 +13,7 @@
 #include "DataLogger.h"
 #include "ParameterHandler.h"
 #include "SerialHandler.h"
-#include "LEDControl.h" 
+#include "LEDControl.h"
 #include <SPIFFS.h>
 
 // MPU
@@ -27,8 +27,11 @@ extern int ledPin;
 LEDControl ledControl(ledPin);
 
 // FilterHandler für Roll und Pitch erstellen
-FilterHandler rollFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, pidRoll);
-FilterHandler pitchFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, pidPitch);
+FilterHandler rollFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, 
+                                 kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, sampleRate);
+
+FilterHandler pitchFilterHandler(lowPassCutoffFrequency, highPassCutoffFrequency, movingAvgWindowSize, 
+                                  kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate, sampleRate);
 
 // FBL-Objekt
 FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, logger);
@@ -36,7 +39,6 @@ FBL fbl(pinServo1, pinServo2, pinServo3, rollFilterHandler, pitchFilterHandler, 
 // Motoren
 MainMotor mainMotorServo(mainMotorPin);
 TailRotor tailRotor(tailMotorPin, scaleFactor, pidYaw);
-
 
 SBUSReceiver sbusReceiver(Serial2);
 
@@ -57,17 +59,12 @@ void setup() {
     listSPIFFSFiles();
 
     const char* filePath = "/SystemDatabase/database.json";
-    
     initializeParametersFromJSON(filePath);
 
     initWatchdog(2);
-
     sbusReceiver.begin();
-
     Wire.begin(wireSDA, wireSCL);
-
     mpu.begin();
-
     MPU6050Calibration::beginCalibration(calibrationDuration);
 
     fbl.setup();
@@ -78,6 +75,12 @@ void setup() {
 }
 
 void loop() {
+    static unsigned long lastUpdateTime = 0;
+    if (millis() - lastUpdateTime < 15) {
+        return;
+    }
+    lastUpdateTime = millis();
+
     unsigned int channel1Pulse, channel2Pulse, channel3Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse;
 
     processSerialData();
@@ -93,22 +96,16 @@ void loop() {
     }
 
     if (sbusReceiver.readChannels(channel1Pulse, channel2Pulse, channel3Pulse, channel4Pulse, channel6Pulse, channel8Pulse, channel9Pulse, channel10Pulse)) {
-        // Deklariere die Event-Variablen
-        sensors_event_t a, g, temp;
-
-        // Rufe die Daten des MPU ab
+        sensors_event_t a, g, temp;  // Dummy für Temperaturdaten
         mpu.getEvent(&a, &g, &temp);
+
 
         // Prüfe, ob die Korrektur für die FBL aktiviert ist
         if (Util::correctionEnabled(channel10Pulse) && mpu.isConnected()) {
-            // Aktiviert die Korrektur für die Swashplate
             fbl.update(mpu, channel1Pulse, channel2Pulse, channel6Pulse, useLowPass, useHighPass, useMovingAvg, useKalman);
             ledControl.steadyOn();
         } else {
-            // Deaktiviert die Korrektur und steuert die Servos direkt
-            fbl.servo1.writeMicroseconds(channel2Pulse);
-            fbl.servo2.writeMicroseconds(channel6Pulse);
-            fbl.servo3.writeMicroseconds(channel1Pulse);
+            fbl.directServoControl(channel1Pulse, channel2Pulse, channel6Pulse);
             ledControl.steadyOff();
         }
 
@@ -119,14 +116,9 @@ void loop() {
             tailRotor.setCorrectionEnabled(false);
         }
 
-        // Update des Heckrotors (mit oder ohne Korrektur)
         tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
-
-        // Setze den MainMotor-Puls
         mainMotorServo.setPulse(channel8Pulse);
     } else {
         Serial.println("Fehler beim Lesen der Kanäle.");
     }
-
-    delay(15);
 }

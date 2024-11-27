@@ -52,7 +52,7 @@ float kalmanInitialEstimate = 0.0;
 bool useLowPass = true;
 bool useHighPass = false;
 bool useMovingAvg = false;
-bool useKalman = false;
+bool useKalman = true;
 
 // CG-Offsets für den MPU
 float cgOffsetX = -0.09;
