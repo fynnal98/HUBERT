@@ -1,5 +1,5 @@
-#ifndef FILTERHANDLER_H
-#define FILTERHANDLER_H
+#ifndef FILTER_HANDLER_H
+#define FILTER_HANDLER_H
 
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
@@ -14,31 +14,41 @@ public:
                   float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate,
                   PID& rollPID, PID& pitchPID, float sampleRate);
 
-    // Methoden
+    // Setzt die Schwerpunkt-Offsets
     void setCGOffsets(float offsetX, float offsetY, float offsetZ);
-    float processRoll(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg);
-    float processPitch(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg);
+
+    // Verarbeitung für Roll
+    float processRoll(float accelX, float accelY, float accelZ, float gyroRate,
+                      bool useLowPass, bool useHighPass, bool useMovingAvg);
+
+    // Verarbeitung für Pitch
+    float processPitch(float accelX, float accelY, float accelZ, float gyroRate,
+                       bool useLowPass, bool useHighPass, bool useMovingAvg);
 
 private:
-    // Filterinstanzen
+    // Interne Methoden
+    float calculateDeltaTime(); // Berechnet die Zeitdifferenz
+    float applyFilters(float value, bool useLowPass, bool useHighPass, bool useMovingAvg); // Anwenden der Filter
+    float complementaryFusion(float accelAngle, float gyroRate, float dt, float alpha); // Komplementär-Filter
+
+    // Filter
     LowPassFilter lowPassFilter;
     HighPassFilter highPassFilter;
     MovingAverageFilter movingAvgFilter;
     KalmanFilter kalmanFilter;
 
-    // PID-Referenzen
+    // PID-Controller
     PID& rollPID;
     PID& pitchPID;
 
     // Schwerpunkt-Offsets
     float cgOffsetX, cgOffsetY, cgOffsetZ;
 
-    // Integrierte Gyrodaten
-    float integratedGyroRoll;
-    float integratedGyroPitch;
+    // Zeitmessung
+    unsigned long lastUpdateTime;
 
-    // Methode zur Anwendung von Filtern
-    float applyFilters(float value, bool useLowPass, bool useHighPass, bool useMovingAvg);
+    // Fusion-Parameter
+    float alpha;
 };
 
-#endif // FILTERHANDLER_H
+#endif // FILTER_HANDLER_H

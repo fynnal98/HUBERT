@@ -26,29 +26,30 @@ void MPU6050::begin() {
 void MPU6050::configureMPU6050() {
     Wire.beginTransmission(MPU6050_ADDRESS);
 
-    // CONFIG (Digital Low Pass Filter auf 20 Hz)
+    // CONFIG (Digital Low Pass Filter auf 5 Hz, maximale Filterung)
     Wire.write(0x1A); 
-    Wire.write(0x04); 
+    Wire.write(0x06); 
     Wire.endTransmission();
 
-    // SMPLRT_DIV (500 Hz Abtastrate)
+    // SMPLRT_DIV (Abtastrate auf 250 Hz einstellen)
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(MPU6050_SMPLRT_DIV); 
-    Wire.write(0x01); 
+    Wire.write(0x03); 
     Wire.endTransmission();
 
-    // GYRO_CONFIG (±500°/s)
+    // GYRO_CONFIG (±250°/s, geringste Empfindlichkeit für Gyroskop)
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(0x1B); 
-    Wire.write(0x08); 
+    Wire.write(0x00); 
     Wire.endTransmission();
 
-    // ACCEL_CONFIG (±4g)
+    // ACCEL_CONFIG (±2g, geringste Empfindlichkeit für Beschleunigungsmesser)
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(0x1C); 
-    Wire.write(0x08); 
+    Wire.write(0x00); 
     Wire.endTransmission();
 }
+
 
 
 void MPU6050::checkConnectionAndBlink() {

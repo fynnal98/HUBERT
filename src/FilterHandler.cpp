@@ -1,5 +1,5 @@
 #include "FilterHandler.h"
-#include <Arduino.h> // Für Debugging mit Serial
+#include <Arduino.h> // Für Zeitmessung und Debugging
 
 FilterHandler::FilterHandler(float lowPassCutoff, float highPassCutoff, int movingAvgWindowSize,
                              float kalmanQ, float kalmanR, float kalmanEstimateError, float kalmanInitialEstimate,
@@ -8,13 +8,11 @@ FilterHandler::FilterHandler(float lowPassCutoff, float highPassCutoff, int movi
       highPassFilter(highPassCutoff, sampleRate),
       movingAvgFilter(movingAvgWindowSize),
       kalmanFilter(kalmanQ, kalmanR, kalmanEstimateError, kalmanInitialEstimate),
-      rollPID(rollPID), // Initialisierung der Referenzen
+      rollPID(rollPID),
       pitchPID(pitchPID),
       cgOffsetX(0), cgOffsetY(0), cgOffsetZ(0),
-      integratedGyroRoll(0), integratedGyroPitch(0) {}
-
-
-
+      lastUpdateTime(0),
+      alpha(0.9) {}
 
 void FilterHandler::setCGOffsets(float offsetX, float offsetY, float offsetZ) {
     cgOffsetX = offsetX;
@@ -22,44 +20,47 @@ void FilterHandler::setCGOffsets(float offsetX, float offsetY, float offsetZ) {
     cgOffsetZ = offsetZ;
 }
 
-float FilterHandler::processRoll(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg) {
-    // Absicherung des Zeitschritts
-    if (dt <= 0 || dt > 1.0) dt = 0.01;
+float FilterHandler::calculateDeltaTime() {
+    unsigned long currentTime = millis();
+    float dt = (currentTime - lastUpdateTime) / 1000.0; // Millisekunden in Sekunden umrechnen
+    lastUpdateTime = currentTime;
 
-    // Korrigiere die Beschleunigungsdaten
-    float correctedAccel = accel - (gyro * cgOffsetZ);
-
-    // // Integriere Gyro-Daten
-    // integratedGyroRoll += gyro * dt;
-
-    // // Fusion: Kalman-Filter kombiniert Gyro- und Beschleunigungsdaten
-    // float fusedValue = kalmanFilter.update(integratedGyroRoll, correctedAccel, dt);
-
-    // // PID-Regelung für die Roll-Achse
-    // float pidOutput = rollPID.compute(fusedValue, 0); // Sollwert ist 0 (stabil)
-
-    // Filter anwenden
-    return applyFilters(correctedAccel, useLowPass, useHighPass, useMovingAvg);
+    if (dt <= 0 || dt > 1.0) { // Fallback für ungültige dt-Werte
+        dt = 0.01;
+    }
+    return dt;
 }
 
-float FilterHandler::processPitch(float accel, float gyro, float dt, bool useLowPass, bool useHighPass, bool useMovingAvg) {
-    // Absicherung des Zeitschritts
-    if (dt <= 0 || dt > 1.0) dt = 0.01;
+float FilterHandler::processRoll(float accelX, float accelY, float accelZ, float gyroRate, bool useLowPass, bool useHighPass, bool useMovingAvg) {
+    float dt = calculateDeltaTime(); // Zeitdifferenz berechnen
 
-    // Korrigiere die Beschleunigungsdaten
-    float correctedAccel = accel - (gyro * cgOffsetX);
+    // Roll-Winkel aus Accelerometer berechnen
+    float rollAccelAngle = atan2(accelY, accelZ) * (180.0 / PI);
 
-    // // Integriere Gyro-Daten
-    // integratedGyroPitch += gyro * dt;
+    // Fusion mit Gyro-Daten (z. B. mit einem Complementary Filter)
+    float fusedRoll = complementaryFusion(rollAccelAngle, gyroRate, dt, alpha);
 
-    // // Fusion: Kalman-Filter kombiniert Gyro- und Beschleunigungsdaten
-    // float fusedValue = kalmanFilter.update(integratedGyroPitch, correctedAccel, dt);
+    // PID-Regelung anwenden
+    float pidOutput = rollPID.compute(0, fusedRoll); // Sollwert ist 0 (stabiler Zustand)
 
-    // // PID-Regelung für die Pitch-Achse
-    // float pidOutput = pitchPID.compute(fusedValue, 0); // Sollwert ist 0 (stabil)
+    // Filter anwenden (optional)
+    return applyFilters(-pidOutput, useLowPass, useHighPass, useMovingAvg);
+}
 
-    // Filter anwenden
-    return applyFilters(correctedAccel, useLowPass, useHighPass, useMovingAvg);
+float FilterHandler::processPitch(float accelX, float accelY, float accelZ, float gyroRate, bool useLowPass, bool useHighPass, bool useMovingAvg) {
+    float dt = calculateDeltaTime(); // Zeitdifferenz berechnen
+
+    // Pitch-Winkel aus Accelerometer berechnen
+    float pitchAccelAngle = atan2(accelX, sqrt(accelY * accelY + accelZ * accelZ)) * (180.0 / PI);
+
+    // Fusion mit Gyro-Daten (z. B. mit einem Complementary Filter)
+    float fusedPitch = complementaryFusion(pitchAccelAngle, gyroRate, dt, alpha);
+
+    // PID-Regelung anwenden
+    float pidOutput = pitchPID.compute(0, fusedPitch); // Sollwert ist 0 (stabiler Zustand)
+
+    // Filter anwenden (optional)
+    return applyFilters(-pidOutput, useLowPass, useHighPass, useMovingAvg);
 }
 
 float FilterHandler::applyFilters(float value, bool useLowPass, bool useHighPass, bool useMovingAvg) {
@@ -67,4 +68,12 @@ float FilterHandler::applyFilters(float value, bool useLowPass, bool useHighPass
     if (useHighPass) value = highPassFilter.apply(value);
     if (useMovingAvg) value = movingAvgFilter.apply(value);
     return value;
+}
+
+float FilterHandler::complementaryFusion(float accelAngle, float gyroRate, float dt, float alpha) {
+    // Gyro-Daten korrigieren
+    float correctedGyroRate = gyroRate - (accelAngle * cgOffsetX); 
+
+    // Fusion von Gyro- und Accelerometer-Daten
+    return alpha * (correctedGyroRate * dt) + (1 - alpha) * accelAngle;
 }

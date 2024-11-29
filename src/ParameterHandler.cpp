@@ -12,13 +12,13 @@ int pinServo3 = 15;
 int ledPin = 2;  
 
 // PID-Controller
-PID pidRoll(90.0, 0.0, 0, integralLimit, rollPIDFactor);
-PID pidPitch(90.0, 0.0, 0, integralLimit, pitchPIDFactor);
+PID pidRoll(2.0, 0.1, 1, integralLimit, rollPIDFactor);
+PID pidPitch(2.0, 0.1, 1, integralLimit, pitchPIDFactor);
 PID pidYaw(90.0, 0.0, 5.0, integralLimit, yawPIDFactor);
 
-float rollPIDFactor = 1;
-float pitchPIDFactor = 1;
-float yawPIDFactor = 2;
+float rollPIDFactor = 1.2;
+float pitchPIDFactor = 1.2;
+float yawPIDFactor = 1.8;
 float integralLimit = 100.0;
 
 // Motor-Pins
@@ -49,7 +49,7 @@ float kalmanEstimateError = 1.0;
 float kalmanInitialEstimate = 0.0;
 
 // Flags, um Filter zu aktivieren oder deaktivieren
-bool useLowPass = false;
+bool useLowPass = true;
 bool useHighPass = false;
 bool useMovingAvg = false;
 bool useKalman = true; 
@@ -65,7 +65,7 @@ float gyroDriftOffsetY = 0.0;
 float gyroDriftOffsetZ = 0.0;
 
 // Kalibrierungsparameter
-int calibrationDuration = 1000;
+int calibrationDuration = 400;
 
 // Kalibrierungsstatus
 bool calibrationCompleted = false;  

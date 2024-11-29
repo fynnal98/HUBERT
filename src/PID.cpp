@@ -7,8 +7,8 @@ PID::PID(float kp, float ki, float kd, float integralLimit, float factor)
 float PID::compute(float setpoint, float measured) {
     float error = setpoint - measured;
 
-    Serial.print("Error: ");
-    Serial.println(error);
+    // Serial.print("Error: ");
+    // Serial.println(error);
 
     integral += error;
     if (integral > integralLimit) {
@@ -22,8 +22,8 @@ float PID::compute(float setpoint, float measured) {
 
     float output = (kp * error + ki * integral + kd * derivative) * factor;
 
-    Serial.print("PID Output: ");
-    Serial.println(output);
+    // Serial.print("PID Output: ");
+    // Serial.println(output);
 
     return output;
 }

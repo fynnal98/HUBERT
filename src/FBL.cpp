@@ -33,14 +33,13 @@ void FBL::update(MPU6050& mpu, unsigned long channel1Pulse, unsigned long channe
     sensors_event_t a, g, temp;  // Dummy für Temperaturdaten
     mpu.getEvent(&a, &g, &temp);
 
-    // Berechne Korrekturwerte
-    float rollCorrection = rollFilterHandler.processRoll(a.acceleration.y, g.gyro.x, dt, useLowPass, useHighPass, useMovingAvg);
-    float pitchCorrection = pitchFilterHandler.processPitch(a.acceleration.x, g.gyro.y, dt, useLowPass, useHighPass, useMovingAvg);
+    float rollCorrection = rollFilterHandler.processRoll(a.acceleration.x, a.acceleration.y, a.acceleration.z, g.gyro.x, useLowPass, useHighPass, useMovingAvg);
+    float pitchCorrection = pitchFilterHandler.processPitch(a.acceleration.x, a.acceleration.y, a.acceleration.z, g.gyro.y, useLowPass, useHighPass, useMovingAvg);
 
     // Anwenden der Korrekturen auf die Servokanäle
-    unsigned long servo1Pulse = channel2Pulse + pitchCorrection*100; // Back
-    unsigned long servo2Pulse = channel6Pulse + (-0.5 * pitchCorrection - 0.866 * rollCorrection)*100; // Left
-    unsigned long servo3Pulse = channel1Pulse - (-0.5 * pitchCorrection + 0.866 * rollCorrection)*100; // Right
+    unsigned long servo1Pulse = channel2Pulse + pitchCorrection; // Back
+    unsigned long servo2Pulse = channel6Pulse + (-0.5 * pitchCorrection - 0.866 * rollCorrection); // Left
+    unsigned long servo3Pulse = channel1Pulse - (-0.5 * pitchCorrection + 0.866 * rollCorrection); // Right
 
     servo1Pulse = constrain(servo1Pulse, 1000, 2000);
     servo2Pulse = constrain(servo2Pulse, 1000, 2000);

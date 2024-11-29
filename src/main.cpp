@@ -123,6 +123,7 @@ void loop() {
         tailRotor.update(channel8Pulse, channel4Pulse, g.gyro.z);
         mainMotorServo.setPulse(channel8Pulse);
     } else {
-        Serial.println("Fehler beim Lesen der Kanäle.");
+        
     }
 }
+
