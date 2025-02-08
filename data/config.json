@@ -1,0 +1,57 @@
+{
+  "payload-definition": {
+    "0x01": {
+      "name": "telemetry",
+      "description": "Used to transmit live telemetry data from sensors."
+    },
+    "0x02": {
+      "name": "config",
+      "description": "Configuration updates for devices like sensors or modes."
+    },
+    "0x03": {
+      "name": "sensors",
+      "description": "Sensor-related data like pins and offsets."
+    },
+    "0x04": {
+      "name": "network",
+      "description": "Network configuration settings like WiFi and TCP ports."
+    }
+  },
+
+  "network": {
+    "id": "0x04",
+    "payload": {
+      "wifi": {
+        "ssid": "HUBERT",
+        "password": "12345678",
+        "port": 4210
+      }
+    }
+  },
+
+  "sensors": {
+    "mpu6050": {
+      "id": "0x03",
+      "payload": {
+        "sda_pin": 21,
+        "scl_pin": 22,
+        "filters": {
+          "complementary": { "enabled": true, "alpha": 0.9 },
+          "lowpass": { "enabled": true, "cutoff_frequency": 20 },
+          "highpass": { "enabled": false, "cutoff_frequency": 0.1 }
+        }
+      }
+    },
+    "bmp280": {
+      "id": "0x03",
+      "payload": {
+        "sda_pin": 19,
+        "scl_pin": 23,
+        "offsets": {
+          "temperature": -2.5,
+          "pressure": 1.1
+        }
+      }
+    }
+  }
+}
