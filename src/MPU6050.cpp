@@ -26,17 +26,24 @@ void MPU6050::begin(JsonHandler* db) {
 }
 
 void MPU6050::configureMPU6050() {
-    // Digitaler Tiefpassfilter (DLPF) auf 5 Hz einstellen
-    mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
-    Serial.println("DLPF auf 5 Hz eingestellt.");
+    Wire.beginTransmission(MPU6050_ADDRESS);
 
-    // Gyroskopsensor auf ±250°/s einstellen
-    mpu.setGyroRange(MPU6050_RANGE_250_DEG);
-    Serial.println("Gyroskopbereich auf ±250°/s eingestellt.");
+    // CONFIG (Digital Low Pass Filter auf 5 Hz, maximale Filterung)
+    Wire.write(0x1A);
+    Wire.write(0x06);
+    Wire.endTransmission();
 
-    // Beschleunigungssensor auf ±2g einstellen
-    mpu.setAccelerometerRange(MPU6050_RANGE_2_G);
-    Serial.println("Beschleunigungssensorbereich auf ±2g eingestellt.");
+    // GYRO_CONFIG (±250°/s)
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(0x1B);
+    Wire.write(0x00);
+    Wire.endTransmission();
+
+    // ACCEL_CONFIG (±2g)
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(0x1C);
+    Wire.write(0x00);
+    Wire.endTransmission();
 }
 
 bool MPU6050::isConnected() const {

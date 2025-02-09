@@ -50,9 +50,9 @@ std::string SBUSHandler::getInput() {
 
 int SBUSHandler::getChannelValue(int channel) {
     if (channel >= 0 && channel < bfs::SbusData::NUM_CH) {
-        return channelData[channel];
+        int value = channelData[channel - 1];
+        return value;
     } else {
-        Serial.printf("Ungültiger Kanal: %d\n", channel);
-        return -1;
+        return 0; 
     }
 }
