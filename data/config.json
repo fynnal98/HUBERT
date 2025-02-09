@@ -1,57 +1,141 @@
 {
-  "payload-definition": {
-    "0x01": {
-      "name": "telemetry",
-      "description": "Used to transmit live telemetry data from sensors."
-    },
-    "0x02": {
-      "name": "config",
-      "description": "Configuration updates for devices like sensors or modes."
-    },
-    "0x03": {
-      "name": "sensors",
-      "description": "Sensor-related data like pins and offsets."
-    },
-    "0x04": {
-      "name": "network",
-      "description": "Network configuration settings like WiFi and TCP ports."
-    }
+  "payload-type-mapping": {
+    "0x01": "config",
+    "0x02": "main",
+    "0x03": "heli",
+    "0x04": "drone",
+    "0x05": "plane",
+    "0x06": "telemetry"
   },
 
-  "network": {
-    "id": "0x04",
-    "payload": {
-      "wifi": {
-        "ssid": "HUBERT",
-        "password": "12345678",
-        "port": 4210
-      }
-    }
+  "config": {
+    "wifi": {
+      "ssid": "HUBERT",
+      "password": "12345678",
+      "port": 4210
+    },
+    "input": {
+      "method": "sbus",
+      "sbus": {
+        "rxPin": 16,
+        "txPin": 12
+      },
+      "app": {}
+    },
+    "mode": "heli" 
   },
 
-  "sensors": {
+  "main": {
     "mpu6050": {
-      "id": "0x03",
-      "payload": {
-        "sda_pin": 21,
-        "scl_pin": 22,
-        "filters": {
-          "complementary": { "enabled": true, "alpha": 0.9 },
-          "lowpass": { "enabled": true, "cutoff_frequency": 20 },
-          "highpass": { "enabled": false, "cutoff_frequency": 0.1 }
+      "sda": 21,
+      "scl": 22,
+      "offset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "filters": {
+        "complementary": {
+          "enabled": true,
+          "alpha": 0.9
+        },
+        "lowpass": {
+          "enabled": true,
+          "cutoffFrequency": 20
+        },
+        "highpass": {
+          "enabled": false,
+          "cutoffFrequency": 0.1
         }
       }
     },
     "bmp280": {
-      "id": "0x03",
-      "payload": {
-        "sda_pin": 19,
-        "scl_pin": 23,
-        "offsets": {
-          "temperature": -2.5,
-          "pressure": 1.1
-        }
+      "sda": 19,
+      "scl": 23,
+      "offsets": {
+        "temperature": -2.5,
+        "pressure": 1.1
       }
+    }
+  },
+
+  "heli": {
+    "ServoBack": 13,
+    "ServoLeft": 14,
+    "ServoRight": 15,
+    "MotorMain": 5,
+    "MotorAft": 17,
+    "yawFactor": 0.9,
+    "Channels": {
+      "roll": 1,
+      "pitch": 2,
+      "thrust": 6,
+      "yaw": 4,
+      "MotorMain": 8
+    },
+    "pid": {
+      "kp": 15.0,
+      "ki": 0.0,
+      "kd": 0.1
+    }
+  },
+
+  "drone": {
+    "Motor01pin": 0,
+    "Motor02pin": 1,
+    "Motor03pin": 2,
+    "Motor04pin": 3,
+    "pwmResolution": 10,
+    "pwmFrequency": 50,
+    "pid": {
+      "kp": 1.0,
+      "ki": 0.0,
+      "kd": 0.2
+    },
+    "Channels": {
+      "ChannelYaw": 4,
+      "ChannelPitch": 2,
+      "ChannelRoll": 1,
+      "ChannelThrottle": 3
+    }
+  },
+
+  "plane": {
+    "Motor01pin": 5,
+    "ServoRuder": 19,
+    "ServoElevator": 12,
+    "ServoAileron": 13,
+    "ServoFlaps": 18,
+    "ServoGear": 11
+  },
+
+  "telemetry": {
+    "status": {
+      "sensor_id": 1,
+      "timestamp": 0,
+      "system_status": "OK"
+    },
+    "sensors": {
+      "mpu6050": {
+        "acc_x": 0.0,
+        "acc_y": 0.0,
+        "acc_z": 0.0,
+        "gyro_x": 0.0,
+        "gyro_y": 0.0,
+        "gyro_z": 0.0,
+        "temperature": 0.0
+      },
+      "bmp280": {
+        "temperature": 0.0,
+        "pressure": 0.0,
+        "altitude": 0.0
+      }
+    },
+    "position": {
+      "altitude": 0.0,
+      "latitude": 0.0,
+      "longitude": 0.0,
+      "speed": 0.0
     }
   }
 }

@@ -13,6 +13,8 @@ public:
     bool LoadJson();
     bool SaveJson();
 
+    JsonVariant resolvePath(const std::string& path, bool createMissing = false);
+
     template <typename T>
     T GetValueByKey(const std::string& path, T defaultValue) {
         JsonVariant value = resolvePath(path);
@@ -34,7 +36,6 @@ public:
 private:
     std::string m_filePath;
     ArduinoJson::StaticJsonDocument<2048> m_jsonDoc;
-    JsonVariant resolvePath(const std::string& path, bool createMissing = false);
 };
 
 #endif
