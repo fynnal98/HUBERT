@@ -7,8 +7,8 @@ MPU6050::MPU6050() : mpu(), mpuConnected(false) {}
 
 void MPU6050::begin(JsonHandler* db) {
     // Pins für I²C aus der JSON-Konfiguration laden
-    int sda = db->GetValueByKey<int>("main/mpu6050/sda", 21);
-    int scl = db->GetValueByKey<int>("main/mpu6050/scl", 22);
+    int sda = db->GetValueByKey<int>("config/sensors/mpu6050/sda", 21);
+    int scl = db->GetValueByKey<int>("config/sensors/mpu6050/scl", 22);
 
     // I²C starten
     Wire.begin(sda, scl);

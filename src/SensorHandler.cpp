@@ -16,14 +16,14 @@ void SensorHandler::begin(JsonHandler* db) {
     Serial.println("MPU6050 erfolgreich initialisiert.");
 
     // Lade Filterparameter aus der JSON-Konfiguration
-    complementaryEnabled = db->GetValueByKey<bool>("main/mpu6050/filters/complementary/enabled", false);
-    alpha = db->GetValueByKey<float>("main/mpu6050/filters/complementary/alpha", 0.98);
+    complementaryEnabled = db->GetValueByKey<bool>("config/sensors/mpu6050/filters/complementary/enabled", false);
+    alpha = db->GetValueByKey<float>("config/sensors/mpu6050/filters/complementary/alpha", 0.98);
 
-    lowPassEnabled = db->GetValueByKey<bool>("main/mpu6050/filters/lowpass/enabled", false);
-    lowPassCutoff = db->GetValueByKey<float>("main/mpu6050/filters/lowpass/cutoffFrequency", 5.0);
+    lowPassEnabled = db->GetValueByKey<bool>("config/sensors/mpu6050/filters/lowpass/enabled", false);
+    lowPassCutoff = db->GetValueByKey<float>("config/sensors/mpu6050/filters/lowpass/cutoffFrequency", 5.0);
 
-    highPassEnabled = db->GetValueByKey<bool>("main/mpu6050/filters/highpass/enabled", false);
-    highPassCutoff = db->GetValueByKey<float>("main/mpu6050/filters/highpass/cutoffFrequency", 0.1);
+    highPassEnabled = db->GetValueByKey<bool>("config/sensors/mpu6050/filters/highpass/enabled", false);
+    highPassCutoff = db->GetValueByKey<float>("config/sensors/mpu6050/filters/highpass/cutoffFrequency", 0.1);
 }
 
 void SensorHandler::update() {

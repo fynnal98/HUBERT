@@ -8,18 +8,18 @@ void HeliLogic::loadParameters() {
     Serial.println("Lade Helikopter-Parameter...");
 
     // PID-Parameter laden
-    kp = m_jsonHandler->GetValueByKey<float>("heli/pid/kp", 1.0f);
-    ki = m_jsonHandler->GetValueByKey<float>("heli/pid/ki", 0.0f);
-    kd = m_jsonHandler->GetValueByKey<float>("heli/pid/kd", 0.0f);
+    kp = m_jsonHandler->GetValueByKey<float>("config/modis/heli/pid/kp", 1.0f);
+    ki = m_jsonHandler->GetValueByKey<float>("config/modis/heli/pid/ki", 0.0f);
+    kd = m_jsonHandler->GetValueByKey<float>("config/modis/heli/pid/kd", 0.0f);
 
-    yawFactor = m_jsonHandler->GetValueByKey<float>("heli/yawFactor", 1.0f);
+    yawFactor = m_jsonHandler->GetValueByKey<float>("config/modis/heli/yawFactor", 1.0f);
 
     // Pins aus der JSON-Konfiguration laden
-    m_motorMainPin = m_jsonHandler->GetValueByKey<int>("heli/MotorMain", -1);
-    m_motorAftPin = m_jsonHandler->GetValueByKey<int>("heli/MotorAft", -1);
-    m_servoBackPin = m_jsonHandler->GetValueByKey<int>("heli/ServoBack", -1);
-    m_servoLeftPin = m_jsonHandler->GetValueByKey<int>("heli/ServoLeft", -1);
-    m_servoRightPin = m_jsonHandler->GetValueByKey<int>("heli/ServoRight", -1);
+    m_motorMainPin = m_jsonHandler->GetValueByKey<int>("config/modis/heli/MotorMain", -1);
+    m_motorAftPin = m_jsonHandler->GetValueByKey<int>("config/modis/heli/MotorAft", -1);
+    m_servoBackPin = m_jsonHandler->GetValueByKey<int>("config/modis/heli/ServoBack", -1);
+    m_servoLeftPin = m_jsonHandler->GetValueByKey<int>("config/modis/heli/ServoLeft", -1);
+    m_servoRightPin = m_jsonHandler->GetValueByKey<int>("config/modis/heli/ServoRight", -1);
 
     // Serial.printf("Kanäle zugeordnet: roll=%d, pitch=%d, thrust=%d, yaw=%d, motorMain=%d\n",
     //     m_motorMainPin, m_motorAftPin, m_servoBackPin, m_servoLeftPin, m_servoRightPin);
@@ -32,11 +32,11 @@ void HeliLogic::loadParameters() {
     aftMotor.attach(m_motorAftPin);
 
     // Kanäle aus der JSON-Konfiguration laden
-    m_rollChannel = m_jsonHandler->GetValueByKey<int>("heli/Channels/roll", -1);
-    m_pitchChannel = m_jsonHandler->GetValueByKey<int>("heli/Channels/pitch", -1);
-    m_thrustChannel = m_jsonHandler->GetValueByKey<int>("heli/Channels/thrust", -1);
-    m_yawChannel = m_jsonHandler->GetValueByKey<int>("heli/Channels/yaw", -1);
-    m_motorMainChannel = m_jsonHandler->GetValueByKey<int>("heli/Channels/MotorMain",-1);
+    m_rollChannel = m_jsonHandler->GetValueByKey<int>("config/modis/heli/Channels/roll", -1);
+    m_pitchChannel = m_jsonHandler->GetValueByKey<int>("config/modis/heli/Channels/pitch", -1);
+    m_thrustChannel = m_jsonHandler->GetValueByKey<int>("config/modis/heli/Channels/thrust", -1);
+    m_yawChannel = m_jsonHandler->GetValueByKey<int>("config/modis/heli/Channels/yaw", -1);
+    m_motorMainChannel = m_jsonHandler->GetValueByKey<int>("config/modis/heli/Channels/MotorMain",-1);
 
     // Serial.printf("Kanäle zugeordnet: roll=%d, pitch=%d, thrust=%d, yaw=%d, motorMain=%d\n",
     //               m_rollChannel, m_pitchChannel, m_thrustChannel, m_yawChannel, m_motorMainChannel);

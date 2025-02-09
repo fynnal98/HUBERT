@@ -1,30 +1,36 @@
 #include "ConfigManager.h"
-#include "JsonHandler.h"
-#include <ArduinoJson.h>
 #include <Arduino.h>
 
-ConfigManager::ConfigManager(JsonHandler* jsonHandler) : m_jsonHandler(jsonHandler) {}
+ConfigManager::ConfigManager(JsonHandler* jsonHandler)
+    : m_jsonHandler(jsonHandler) {}
 
-void ConfigManager::applyConfiguration(const std::vector<uint8_t>& payload) {
-    StaticJsonDocument<256> doc;
+void ConfigManager::processConfigUpdate(const std::vector<uint8_t>& payload) {
+    StaticJsonDocument<512> doc;
     DeserializationError error = deserializeJson(doc, std::string(payload.begin(), payload.end()));
 
     if (error) {
-        Serial.print("Fehler beim Parsen der Konfigurationsnachricht: ");
+        Serial.print("ConfigManager: Fehler beim Parsen der JSON-Daten: ");
         Serial.println(error.c_str());
         return;
     }
 
-    // Beispiel: Aktualisierung eines PID-Werts in der Konfiguration
-    if (doc.containsKey("heli")) {
-        JsonVariant heliConfig = m_jsonHandler->resolvePath("heli");
-        heliConfig["pid"]["kp"] = doc["heli"]["pid"]["kp"].as<float>();
-        heliConfig["pid"]["ki"] = doc["heli"]["pid"]["ki"].as<float>();
-        heliConfig["pid"]["kd"] = doc["heli"]["pid"]["kd"].as<float>();
+    applyChanges(doc.as<JsonVariant>());
 
-        Serial.println("PID-Parameter der Heli-Konfiguration aktualisiert.");
-    }
-
-    // Speichern der aktualisierten JSON-Konfiguration
+    // Speichern der aktualisierten Konfiguration
     m_jsonHandler->SaveJson();
+}
+
+void ConfigManager::applyChanges(const JsonVariant& updates) {
+    for (JsonPair kv : updates.as<JsonObject>()) {
+        const char* key = kv.key().c_str();
+        JsonVariant value = kv.value();
+
+        JsonVariant target = m_jsonHandler->resolvePath(key);
+        if (!target.isNull()) {
+            target.set(value);
+            Serial.printf("Parameter '%s' aktualisiert.\n", key);
+        } else {
+            Serial.printf("Parameter '%s' nicht gefunden.\n", key);
+        }
+    }
 }

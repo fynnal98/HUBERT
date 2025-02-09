@@ -9,7 +9,7 @@ ModeManager::ModeManager(JsonHandler* jsonHandler, InputManager* inputManager)
 
 void ModeManager::begin() {
     // Lade den initialen Modus aus der JSON-Konfiguration
-    m_currentMode = m_jsonHandler->GetValueByKey<std::string>("config/mode", "heli");
+    m_currentMode = m_jsonHandler->GetValueByKey<std::string>("config/system/mode", "heli");
     Serial.printf("Initialer Modus: %s\n", m_currentMode.c_str());
 
     // Initialisiere die zugehörigen Logiken

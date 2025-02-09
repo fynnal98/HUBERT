@@ -1,19 +1,14 @@
-#ifndef CONFIG_MANAGER_H
-#define CONFIG_MANAGER_H
-
-#include <Arduino.h>
+#pragma once
+#include "JsonHandler.h"
 #include <vector>
-#include <string>
-
-class JsonHandler;
+#include <ArduinoJson.h>
 
 class ConfigManager {
 public:
     ConfigManager(JsonHandler* jsonHandler);
-    void applyConfiguration(const std::vector<uint8_t>& payload);
+    void processConfigUpdate(const std::vector<uint8_t>& payload);
 
 private:
     JsonHandler* m_jsonHandler;
+    void applyChanges(const JsonVariant& updates);
 };
-
-#endif // CONFIG_MANAGER_H

@@ -19,9 +19,9 @@ void WiFiHandler::begin() {
 }
 
 bool WiFiHandler::loadConfig() {
-    m_ssid = jsonHandler.GetValueByKey<std::string>("config/wifi/ssid", "DefaultAP");
-    m_password = jsonHandler.GetValueByKey<std::string>("config/wifi/password", "defaultpass");
-    m_port = jsonHandler.GetValueByKey<uint16_t>("config/wifi/port", 4210);
+    m_ssid = jsonHandler.GetValueByKey<std::string>("config/network/wifi/ssid", "DefaultAP");
+    m_password = jsonHandler.GetValueByKey<std::string>("config/network/wifi/password", "defaultpass");
+    m_port = jsonHandler.GetValueByKey<uint16_t>("config/network/wifi/port", 4210);
 
     if (m_ssid.empty() || m_password.empty()) {
         Serial.println("SSID oder Passwort ist leer. Standardwerte werden verwendet.");

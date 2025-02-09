@@ -9,8 +9,8 @@ SBUSHandler::SBUSHandler() : channelData(bfs::SbusData::NUM_CH, 0), sbus(nullptr
 
 bool SBUSHandler::loadConfig() {
     // Lese die RX- und TX-Pins aus der JSON-Datei
-    rxPin = jsonHandler.GetValueByKey<int>("config/input/sbus/rxPin", -1);
-    txPin = jsonHandler.GetValueByKey<int>("config/input/sbus/txPin", -1);
+    rxPin = jsonHandler.GetValueByKey<int>("config/system/input/sbus/rxPin", -1);
+    txPin = jsonHandler.GetValueByKey<int>("config/system/input/sbus/txPin", -1);
 
     if (rxPin == -1 || txPin == -1) {
         Serial.println("Fehler: RX- oder TX-Pin nicht definiert.");

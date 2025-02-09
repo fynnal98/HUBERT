@@ -9,7 +9,7 @@ InputManager::InputManager(JsonHandler* db, SBUSHandler* sbusHandler, UDPManager
 
 void InputManager::begin() {
     // Eingabemethode aus der JSON-Konfiguration laden
-    m_inputMethod = m_db->GetValueByKey<std::string>("config/input/method", "sbus");
+    m_inputMethod = m_db->GetValueByKey<std::string>("config/system/input/method", "sbus");
     Serial.printf("InputManager: Eingabemethode ist '%s'\n", m_inputMethod.c_str());
 
     if (m_inputMethod == "sbus") {
