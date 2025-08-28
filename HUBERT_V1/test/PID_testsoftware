@@ -1,0 +1,124 @@
+try:
+    import sys
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QPushButton, QCheckBox
+except ImportError as e:
+    print(f"Fehlendes Modul: {e.name}. Bitte installiere es mit 'pip install {e.name}'.")
+    sys.exit(1)
+
+class PID:
+    def __init__(self, kp, ki, kd):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.prev_error = 0
+        self.integral = 0
+
+    def compute(self, setpoint, measured_value, dt):
+        error = setpoint - measured_value
+        self.integral += error * dt
+        derivative = (error - self.prev_error) / dt
+
+        output = self.kp * error + self.ki * self.integral + self.kd * derivative
+
+        self.prev_error = error
+        return output, self.kp * error, self.ki * self.integral, self.kd * derivative
+
+class PIDTestApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('PID Controller Test')
+        self.setGeometry(100, 100, 800, 600)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        self.layout = QVBoxLayout(central_widget)
+
+        self.figure, self.ax = plt.subplots()
+        self.canvas = FigureCanvas(self.figure)
+        self.layout.addWidget(self.canvas)
+
+        self.controls = QHBoxLayout()
+        self.layout.addLayout(self.controls)
+
+        self.input_setpoint = QLineEdit(self)
+        self.input_setpoint.setPlaceholderText("Setpoint")
+        self.controls.addWidget(self.input_setpoint)
+
+        self.input_signal = QLineEdit(self)
+        self.input_signal.setPlaceholderText("Input Signal")
+        self.controls.addWidget(self.input_signal)
+
+        self.button_run = QPushButton('Run', self)
+        self.button_run.clicked.connect(self.run_pid)
+        self.controls.addWidget(self.button_run)
+
+        self.checkbox_p = QCheckBox('Show P', self)
+        self.checkbox_p.setChecked(True)
+        self.controls.addWidget(self.checkbox_p)
+
+        self.checkbox_i = QCheckBox('Show I', self)
+        self.controls.addWidget(self.checkbox_i)
+
+        self.checkbox_d = QCheckBox('Show D', self)
+        self.controls.addWidget(self.checkbox_d)
+
+        self.checkbox_output = QCheckBox('Show Output', self)
+        self.checkbox_output.setChecked(True)
+        self.controls.addWidget(self.checkbox_output)
+
+        self.show()
+
+    def run_pid(self):
+        setpoint = float(self.input_setpoint.text())
+        input_signal = float(self.input_signal.text())
+
+        pid = PID(2.0, 1.0, 0.5)
+        dt = 1.0
+
+        times = np.arange(0, 10, dt)
+        measured_values = np.full_like(times, input_signal)
+        setpoints = np.full_like(times, setpoint)
+        outputs = []
+        p_values = []
+        i_values = []
+        d_values = []
+
+        for t in times:
+            output, p, i, d = pid.compute(setpoint, input_signal, dt)
+            outputs.append(output)
+            p_values.append(p)
+            i_values.append(i)
+            d_values.append(d)
+            input_signal += output * dt  # Simulierte Systemantwort
+
+        self.ax.clear()
+
+        if self.checkbox_p.isChecked():
+            self.ax.plot(times, p_values, label='P')
+        if self.checkbox_i.isChecked():
+            self.ax.plot(times, i_values, label='I')
+        if self.checkbox_d.isChecked():
+            self.ax.plot(times, d_values, label='D')
+        if self.checkbox_output.isChecked():
+            self.ax.plot(times, outputs, label='Output')
+
+        self.ax.plot(times, setpoints, label='Setpoint', linestyle='dashed')
+        self.ax.plot(times, measured_values, label='Input Signal', linestyle='dotted')
+
+        self.ax.legend()
+        self.ax.set_xlabel('Time')
+        self.ax.set_ylabel('Values')
+        self.canvas.draw()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = PIDTestApp()
+    sys.exit(app.exec_())

@@ -84,13 +84,13 @@ void HeliLogic::update(SensorHandler* sensors) {
     servoRight.writeMicroseconds(servoRightPulse);
 }
 
-    /**
-    * Die PID Regelung berechnet den neuen Wert für die Servoansteuerung
-    * @param error <Der aktuelle Fehler
-    * @param lastError <Der Fehler des letzten Schrittes
-    * @param dt Die Zeitdifferenz zum letzten Schritt
-    * @return Summer der drei Terme
-    */
+/**
+* Die PID Regelung berechnet den neuen Wert für die Servoansteuerung
+* @param error Der aktuelle Fehler
+* @param lastError Der Fehler des letzten Schrittes
+* @param dt Die Zeitdifferenz zum letzten Schritt
+* @return Summer der drei Terme
+*/
 float HeliLogic::calculatePID(float error, float& lastError, float dt) {
     float pTerm = kp * error;
     iTerm += ki * error * dt;

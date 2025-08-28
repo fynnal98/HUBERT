@@ -1,0 +1,170 @@
+/* Allgemeine Einstellungen für das gesamte Fenster */
+QWidget {
+    background-color: #2b2b2b;  /* Dunkler Hintergrund */
+    color: #ffffff;  /* Weißer Text */
+    font-family: Poppins, sans-serif;
+    font-size: 9pt;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #3b3b3b;
+    color: #ffffff;
+    border: 2px solid #5c5c5c;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QPushButton:hover {
+    background-color: #4b4b4b;  /* Etwas hellere Farbe beim Hover */
+}
+
+QPushButton:pressed {
+    background-color: #1f1f1f;  /* Farbe, wenn der Button gedrückt wird */
+}
+
+QPushButton:disabled {
+    background-color: #4b4b4b;
+    color: #8c8c8c;  /* Hellgrauer Text für deaktivierte Buttons */
+    border: 2px solid #5c5c5c;
+}
+
+/* Eingabefelder */
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit {
+    background-color: #3b3b3b;
+    color: #ffffff;
+    border: 2px solid #5c5c5c;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus {
+    border: 2px solid #0f8558;
+  /* Fokussierter Rand in Orange */
+}
+
+QLineEdit:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled, QComboBox:disabled, QTextEdit:disabled {
+    background-color: #4b4b4b;  /* Etwas dunklerer Hintergrund für deaktivierte Eingabefelder */
+    color: #8c8c8c;  /* Grauer Text für deaktivierte Eingabefelder */
+    border: 2px solid #5c5c5c;
+}
+
+/* Labels */
+QLabel {
+    color: #ffffff;
+}
+
+QLabel:disabled {
+    color: #8c8c8c;  /* Grauer Text für deaktivierte Labels */
+}
+
+/* Menüs */
+QMenuBar {
+    background-color: #2b2b2b;
+    color: #ffffff;
+}
+
+QMenuBar::item {
+    background-color: #2b2b2b;
+    color: #ffffff;
+}
+
+QMenuBar::item:selected {
+    background-color: #3b3b3b;
+}
+
+QMenu {
+    background-color: #2b2b2b;
+    color: #ffffff;
+}
+
+QMenu::item:selected {
+    background-color: #4b4b4b;
+}
+
+/* Scrollbars */
+QScrollBar:horizontal, QScrollBar:vertical {
+    background-color: #3b3b3b;
+    border: 1px solid #5c5c5c;
+}
+
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background-color: #5c5c5c;
+    border-radius: 5px;
+}
+
+/* Tabs */
+QTabBar::tab {
+    background-color: #3b3b3b;
+    color: #ffffff;
+    padding: 10px;
+    margin: 2px;
+    border: 1px solid #5c5c5c;
+    border-radius: 5px;
+}
+
+QTabBar::tab:selected {
+    background-color: #0f8558;
+}
+
+QTabBar::tab:hover {
+    background-color: #5c5c5c;
+}
+
+/* Progress Bar */
+QProgressBar {
+    background-color: #3b3b3b;
+    color: #ffffff;
+    border: 2px solid #5c5c5c;
+    border-radius: 5px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #0f8558;
+    width: 10px;
+    margin: 1px;
+}
+
+/* Slider */
+QSlider::groove:horizontal, QSlider::groove:vertical {
+    background-color: #5c5c5c;
+    height: 6px;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal, QSlider::handle:vertical {
+    background-color: #0f8558;
+    border: 1px solid #ffffff;
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    border-radius: 7px;
+}
+
+/* Checkboxes */
+QCheckBox {
+    color: #ffffff;
+}
+
+QCheckBox::indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    border: 1px solid #5c5c5c;
+    background-color: #3b3b3b;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #0f8558;
+    border: 1px solid #ffffff;
+}
+
+QCheckBox:disabled {
+    color: #8c8c8c;  /* Grauer Text für deaktivierte Checkboxes */
+}
+
+QCheckBox::indicator:disabled {
+    background-color: #4b4b4b;
+    border: 1px solid #5c5c5c;
+}

@@ -1,0 +1,93 @@
+{
+  "Wifi": {
+    "ssid": "HUBERT",
+    "password": "12345678",
+    "port": 4210
+  },  
+  "input": {
+    "method": "sbus",
+    "sbus": {
+      "rxPin": 16,
+      "txPin": 12
+    },
+    "App": {
+    }
+  },
+  "sensors": {
+    "mpu6050": {
+      "sda": 21,
+      "scl": 22,
+      "offset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "filters": {
+        "complementary": {
+          "enabled": true,
+          "alpha": 0.9
+        },
+        "lowpass": {
+          "enabled": true,
+          "cutoffFrequency": 20
+        },
+        "highpass": {
+          "enabled": false,
+          "cutoffFrequency": 0.1
+        }
+      }
+    },
+    "BMP280": {
+    }
+  },  
+  "mode": {
+    "type": "heli",
+    "drone": {
+      "Motor01pin":0,
+      "Motor02pin": 1,
+      "Motor03pin": 2,
+      "Motor04pin": 3,
+      "pwmResolution": 10,
+      "pwmFrequency": 50,
+      "pid": {
+        "kp": 1,
+        "ki": 0,
+        "kd": 0.2
+      },
+      "Channels": {
+        "ChannelYaw": 4,
+        "ChannelPitch": 2,
+        "ChannelRoll": 1,
+        "ChannelThrottle": 3
+      }
+    },
+    "plane": {
+      "Motor01pin": 5,
+      "ServoRuder": 19,
+      "ServoElevator": 12,
+      "ServoAileron": 13,
+      "ServoFlaps": 18,
+      "ServoGear": 11
+    },
+    "heli": {
+      "ServoBack": 13,
+      "ServoLeft": 14,
+      "ServoRight": 15,
+      "MotorMain": 5,
+      "MotorAft": 17,
+      "yawFactor": 0.9,
+      "Channels": {
+        "roll": 1,
+        "pitch": 2,
+        "thrust": 6,
+        "yaw": 4,
+        "MotorMain": 8
+      },
+      "pid": {
+        "kp": 15,
+        "ki": 0.0,
+        "kd": 0.1
+      }
+    }
+  }  
+}

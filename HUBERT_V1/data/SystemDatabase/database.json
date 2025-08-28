@@ -1,0 +1,95 @@
+{
+  "pins": {
+    "servo": {
+      "pinServo1": 13,
+      "pinServo2": 14,
+      "pinServo3": 15
+    },
+    "motor": {
+      "mainMotorPin": 5,
+      "tailMotorPin": 17
+    },
+    "sbus": {
+      "sbusPin": 16
+    },
+    "wire": {
+      "wireSDA": 21,
+      "wireSCL": 22
+    },
+    "led": {
+      "ledPin": 2
+    }
+  },
+  "pid": {
+    "roll": {
+      "kp": 90.0,
+      "ki": 0.0,
+      "kd": 10.0,
+      "factor": 100.0,
+      "integral_limit": 100.0
+    },
+    "pitch": {
+      "kp": 90.0,
+      "ki": 0.0,
+      "kd": 10.0,
+      "factor": 100.0,
+      "integral_limit": 100.0
+    },
+    "yaw": {
+      "kp": 90.0,
+      "ki": 0.0,
+      "kd": 5.0,
+      "factor": 2.0,
+      "integral_limit": 100.0
+    }
+  },
+
+  
+  "tail": {
+    "scaleFactor": 1.0,
+    "pitchFactor": 1
+  },
+  
+  
+  
+  "filter": {
+    "filterValues": {
+      "lowPassCutoffFrequency": 60.0,
+      "highPassCutoffFrequency": 100.0,
+      "movingAvgWindowSize": 5,
+      "kalmanQ": 0.02,
+      "kalmanR": 0.2,
+      "kalmanEstimateError": 1.0,
+      "kalmanInitialEstimate": 0.0
+    },
+    "flags": {
+      "useLowPass": true,
+      "useHighPass": false,
+      "useMovingAvg": false,
+      "useKalman": false
+    },
+    "rpm": {
+      "rpm": 20000,
+      "bandwidth": 10.0
+    }
+  },
+  "gyro": {
+    "mpu_offsets": {
+      "cgOffsetX": -0.09,
+      "cgOffsetY": 0.0,
+      "cgOffsetZ": 0.0
+    },
+    "drift_offsets": {
+      "gyroDriftOffsetX": 0.0,
+      "gyroDriftOffsetY": 0.0,
+      "gyroDriftOffsetZ": 0.0
+    },
+    "calibration": {
+      "duration": 1000,
+      "completed": false
+    }
+  },
+  "config": {
+    "sampleRate": 1000.0
+  }
+}
