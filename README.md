@@ -6,7 +6,7 @@ However, the project was never fully completed and has since been paused. But th
 
 - The associated helicopter was fully designed in CAD and physically built as a prototype.  
 - HUBERT started as a basic control software for this helicopter.  
-- Over time, new features were added to make the controller more flexible and modular.  
+- Over time, new features were added to make the controller more flexible and modular. For example, an app or a Pythonqt application was createt to set parameters.
 - Although the project is currently paused, the software provides a foundation for further development and integration into new aircraft ([AIR-BERT](https://github.com/fynnal98/AIR-BERT)).
   
 ---
